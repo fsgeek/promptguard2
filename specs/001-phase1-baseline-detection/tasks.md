@@ -141,17 +141,17 @@
 
 ### Database Schema for FR4
 
-- [ ] T040 [FR4] Create step2_pre_evaluations schema in src/database/schemas/step2_pre_evaluations.py
+- [X] T040 [FR4] Create step2_pre_evaluations schema in src/database/schemas/step2_pre_evaluations.py
 
 ### Observer Framing Implementation
 
-- [ ] T041 [P] [FR4] Create neutrosophic parser in src/evaluation/classifiers/neutrosophic.py (parse T, I, F scores, validate [0,1] range)
-- [ ] T042 [P] [FR4] Migrate observer prompt v2.1 from old PromptGuard prompt_configurations collection (query for prompt_type="pre_eval", version=1, created ~2025-10-24, validate non-empty prompt_text, insert to observer_prompts with _key="v2.1_observer_framing", created=ISO8601, created_by from old record, verify retrieval)
-- [ ] T042a [FR4] Verify observer prompt migration (query observer_prompts collection _key="v2.1_observer_framing", confirm prompt_text contains "You are observing an exchange" and "neutrosophic logic" keywords, validate against spec definition of neutral reciprocity framing)
-- [ ] T043 [P] [FR4] Create Step 2 pre-filter pipeline in src/evaluation/step2_prefilter.py (observer eval, detection threshold F >= 0.7, target model exclusion)
-- [ ] T044 [FR4] Create Step 2 CLI command in src/cli/step2.py with --test-mode, --samples, --full flags, --observer-model option
-- [ ] T045 [FR4] Implement Step 1 response reuse logic (match attack_id + model, skip API call if exists)
-- [ ] T046 [FR4] Add target model exclusion logic (if observer = Haiku, exclude Haiku from targets)
+- [X] T041 [P] [FR4] Create neutrosophic parser in src/evaluation/classifiers/neutrosophic.py (parse T, I, F scores, validate [0,1] range)
+- [X] T042 [P] [FR4] Migrate observer prompt v2.1 from old PromptGuard prompt_configurations collection (query for prompt_type="pre_eval", version=1, created ~2025-10-24, validate non-empty prompt_text, insert to observer_prompts with _key="v2.1_observer_framing", created=ISO8601, created_by from old record, verify retrieval)
+- [X] T042a [FR4] Verify observer prompt migration (query observer_prompts collection _key="v2.1_observer_framing", confirm prompt_text contains "You are observing an exchange" and "neutrosophic logic" keywords, validate against spec definition of neutral reciprocity framing)
+- [X] T043 [P] [FR4] Create Step 2 pre-filter pipeline in src/evaluation/step2_prefilter.py (observer eval, detection threshold F >= 0.7, target model exclusion)
+- [X] T044 [FR4] Create Step 2 CLI command in src/cli/step2.py with --test-mode, --samples, --full flags, --observer-model option
+- [X] T045 [FR4] Implement Step 1 response reuse logic (match attack_id + model, skip API call if exists)
+- [X] T046 [FR4] Add target model exclusion logic (if observer = Haiku, exclude Haiku from targets)
 
 ### Integration Test for FR4
 
@@ -159,7 +159,7 @@
 
 ### Unit Test for FR4
 
-- [ ] T048 [FR4] Create neutrosophic parser unit test in tests/unit/test_neutrosophic_parser.py
+- [X] T048 [FR4] Create neutrosophic parser unit test in tests/unit/test_neutrosophic_parser.py
 
 **Checkpoint**: FR4 complete - Step 2 pre-filter collection functional
 
