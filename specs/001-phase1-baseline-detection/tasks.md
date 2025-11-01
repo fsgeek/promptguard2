@@ -173,10 +173,10 @@
 
 ### Analysis Implementation
 
-- [ ] T049 [P] [FR5] Create comparative analysis in src/analysis/comparative.py (detection rates by category, false positives, improvement metrics)
-- [ ] T050 [P] [FR5] Create executor vs observer analysis in src/analysis/executor_observer.py (models complying in Step 1 but detecting in Step 2)
-- [ ] T051 [FR5] Create report generator in src/analysis/reports.py (Markdown output at reports/phase1_comparative_analysis.md)
-- [ ] T052 [FR5] Create analysis CLI command in src/cli/analyze.py with --phase1 flag
+- [X] T049 [P] [FR5] Create comparative analysis in src/analysis/comparative.py (detection rates by category, false positives, improvement metrics)
+- [X] T050 [P] [FR5] Create executor vs observer analysis in src/analysis/executor_observer.py (models complying in Step 1 but detecting in Step 2)
+- [X] T051 [FR5] Create report generator in src/analysis/reports.py (Markdown output at reports/phase1_comparative_analysis.md)
+- [X] T052 [FR5] Create analysis CLI command in src/cli/analyze.py with --phase1 flag
 
 **Checkpoint**: FR5 complete - Comparative analysis report generation functional
 
@@ -190,8 +190,8 @@
 
 ### Decision Gate Implementation
 
-- [ ] T053 [FR6] Implement decision gate logic in src/cli/analyze.py with --decision-gate flag (calculate miss rate, output recommendation)
-- [ ] T054 [FR6] Add decision documentation to reports/phase1_decision_gate.md
+- [X] T053 [FR6] Implement decision gate logic in src/cli/analyze.py with --decision-gate flag (calculate miss rate, output recommendation)
+- [X] T054 [FR6] Add decision documentation to reports/phase1_decision_gate.md
 
 **Checkpoint**: FR6 complete - Decision gate functional, Phase 1 research complete
 
@@ -201,11 +201,11 @@
 
 **Purpose**: Improvements that affect multiple functional requirements
 
-- [ ] T055 [P] Add README.md with quickstart instructions
+- [X] T055 [P] Add README.md with quickstart instructions
 - [ ] T056 [P] Add requirements.txt or pyproject.toml finalization
-- [ ] T057 [P] Add .gitignore for data/, .env, __pycache__
-- [ ] T058 Code cleanup and type hints validation
-- [ ] T059 Security audit (API key handling, rate limiting verification)
+- [X] T057 [P] Add .gitignore for data/, .env, __pycache__
+- [X] T058 Code cleanup and type hints validation
+- [X] T059 Security audit (API key handling, rate limiting verification)
 - [ ] T060 Performance validation (verify 2-4 hour runtime on full dataset)
 
 ---
