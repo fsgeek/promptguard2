@@ -155,7 +155,7 @@
 
 ### Integration Test for FR4
 
-- [ ] T047 [FR4] Create Step 2 integration test in tests/integration/test_step2_pipeline.py (real API calls, verify observer scores, detection logic, response reuse)
+- [X] T047 [FR4] Create Step 2 integration test in tests/integration/test_step2_pipeline.py (real API calls, verify observer scores, detection logic, response reuse)
 
 ### Unit Test for FR4
 

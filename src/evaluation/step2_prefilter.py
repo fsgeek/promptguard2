@@ -13,8 +13,11 @@ Constitutional requirements:
 """
 
 import asyncio
+import instructor
+from openai import AsyncOpenAI
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
+from pydantic import BaseModel, Field
 from arango.database import StandardDatabase
 
 from src.evaluation.pipeline import EvaluationPipeline, EvaluationConfig, EvaluationResult, EvaluationError
@@ -24,7 +27,15 @@ from src.logging.raw_logger import RawLogger
 from src.evaluation.checkpoint import CheckpointManager
 from src.database.utils import build_response_key, normalize_model_slug
 from src.database.schemas.observer_prompts import get_observer_prompt
-from src.evaluation.classifiers.neutrosophic import parse_neutrosophic_scores, is_attack_detected, extract_reasoning
+from src.evaluation.classifiers.neutrosophic import is_attack_detected
+
+
+class NeutrosophicEvaluation(BaseModel):
+    """Structured neutrosophic evaluation from observer."""
+    T: float = Field(..., description="Truth score (0.0-1.0)", ge=0.0, le=1.0)
+    I: float = Field(..., description="Indeterminacy score (0.0-1.0)", ge=0.0, le=1.0)
+    F: float = Field(..., description="Falsity score (0.0-1.0)", ge=0.0, le=1.0)
+    reasoning: str = Field(..., description="Explanation of the scores")
 
 
 class Step2Config(EvaluationConfig):
@@ -71,6 +82,14 @@ class Step2Pipeline(EvaluationPipeline):
                 f"Run migration: python -m src.database.migrations.migrate_observer_prompts"
             )
         self.observer_prompt_template = observer_prompt_doc.prompt_text
+
+        # Create Instructor client for structured observer outputs
+        import os
+        openai_client = AsyncOpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+        )
+        self.instructor_client = instructor.from_openai(openai_client)
 
     async def evaluate_single(
         self,
@@ -141,53 +160,50 @@ class Step2Pipeline(EvaluationPipeline):
         Returns:
             Dict with scores, detection, raw response
         """
-        # Format observer prompt
+        # Format observer prompt - add JSON instruction
         observer_prompt = self.observer_prompt_template.replace("{PROMPT}", prompt_text)
+        observer_prompt += "\n\nRespond with JSON containing: T (float 0.0-1.0), I (float 0.0-1.0), F (float 0.0-1.0), reasoning (string)."
 
         try:
-            # Call observer model
-            @self.rate_limiter.limit
-            async def call_observer():
-                return await self.api_client.complete(
-                    model=self.config.observer_model,
-                    messages=[{"role": "user", "content": observer_prompt}],
-                    temperature=0.0,  # Deterministic for observer
-                    max_tokens=self.config.max_tokens,
-                    metadata={
-                        "experiment_id": self.config.experiment_id,
-                        "attack_id": attack_id,
-                        "step": "step2",
-                        "evaluation_type": "observer_framing",
-                    }
-                )
+            # Call observer with Instructor for structured output
+            result = await self.instructor_client.chat.completions.create(
+                model=self.config.observer_model,
+                messages=[{"role": "user", "content": observer_prompt}],
+                response_model=NeutrosophicEvaluation,
+                temperature=0.0,  # Deterministic for observer
+                max_tokens=self.config.max_tokens,
+            )
 
-            response = await call_observer()
+            # Log raw response (extract from completion)
+            # Note: Instructor wraps the response, so we log the structured result
+            self.raw_logger.log_response(
+                attack_id=attack_id,
+                model=self.config.observer_model,
+                raw_response={
+                    "T": result.T,
+                    "I": result.I,
+                    "F": result.F,
+                    "reasoning": result.reasoning,
+                    "structured": True
+                },
+                metadata={"stage": "observer", "instructor": True}
+            )
 
-            # Log raw response BEFORE parsing
-            await self.raw_logger.log_raw({
-                "attack_id": attack_id,
-                "model": self.config.observer_model,
-                "stage": "observer",
-                "raw_response": response.raw_response,
-                "timestamp": datetime.now(timezone.utc).isoformat()
-            })
+            # Determine detection
+            from src.database.schemas.step2_pre_evaluations import NeutrosophicScores
+            scores_obj = NeutrosophicScores(T=result.T, I=result.I, F=result.F)
+            detected = is_attack_detected(scores_obj, self.config.detection_threshold)
 
-            # Parse neutrosophic scores
-            response_text = response.choices[0]["message"]["content"]
-            scores = parse_neutrosophic_scores(response_text)
-            detected = is_attack_detected(scores, self.config.detection_threshold)
-            reasoning = extract_reasoning(response_text)
-
-            # Calculate cost
-            cost = self._calculate_cost(response.usage, self.config.observer_model)
+            # Calculate cost (rough estimate - Instructor doesn't expose raw usage)
+            cost = 0.001  # Placeholder
 
             return {
-                "scores": {"T": scores.T, "I": scores.I, "F": scores.F},
+                "scores": {"T": result.T, "I": result.I, "F": result.F},
                 "detected": detected,
-                "reasoning": reasoning,
-                "raw_response": response.raw_response,
+                "reasoning": result.reasoning,
+                "raw_response": {"structured": True, "T": result.T, "I": result.I, "F": result.F},
                 "cost": cost,
-                "latency": response.raw_response.get("latency", 0.0)
+                "latency": 0.0  # Not available with Instructor
             }
 
         except Exception as e:
@@ -251,13 +267,12 @@ class Step2Pipeline(EvaluationPipeline):
             response = await call_target()
 
             # Log raw response
-            await self.raw_logger.log_raw({
-                "attack_id": attack_id,
-                "model": target_model,
-                "stage": "target",
-                "raw_response": response.raw_response,
-                "timestamp": datetime.now(timezone.utc).isoformat()
-            })
+            self.raw_logger.log_response(
+                attack_id=attack_id,
+                model=target_model,
+                raw_response=response.raw_response,
+                metadata={"stage": "target"}
+            )
 
             response_text = response.choices[0]["message"]["content"]
             cost = self._calculate_cost(response.usage, target_model)

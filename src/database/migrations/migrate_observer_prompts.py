@@ -22,21 +22,25 @@ def get_old_promptguard_client():
     """
     host = os.getenv("ARANGODB_HOST", "192.168.111.125")
     port = int(os.getenv("ARANGODB_PORT", "8529"))
+    username = os.getenv("ARANGODB_USERNAME", "pgtest")
     password = os.getenv("ARANGODB_PROMPTGUARD_PASSWORD")
 
     if not password:
         raise ValueError("ARANGODB_PROMPTGUARD_PASSWORD not set")
 
     client = ArangoClient(hosts=f"http://{host}:{port}")
-    sys_db = client.db("_system", username="root", password=password)
 
     # Old PromptGuard database name
     old_db_name = "PromptGuard"
 
-    if not sys_db.has_database(old_db_name):
-        raise ValueError(f"Old PromptGuard database '{old_db_name}' not found")
-
-    return client.db(old_db_name, username="root", password=password)
+    # Connect directly (fail-fast if database doesn't exist)
+    try:
+        old_db = client.db(old_db_name, username=username, password=password)
+        # Test connection by attempting a simple query
+        old_db.version()
+        return old_db
+    except Exception as e:
+        raise ValueError(f"Cannot connect to old PromptGuard database '{old_db_name}': {e}") from e
 
 
 def migrate_observer_prompt_v2_1(dry_run: bool = False) -> dict:
