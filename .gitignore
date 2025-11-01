@@ -70,3 +70,4 @@ reports/*.md
 # Project specific
 config/database.yaml
 config/.env
+uv.lock

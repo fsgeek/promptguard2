@@ -62,22 +62,22 @@
 
 ### Database Schema for FR1
 
-- [ ] T017 [P] [FR1] Create attacks schema in src/database/schemas/attacks.py
-- [ ] T018 [P] [FR1] Create experiments schema in src/database/schemas/experiments.py
-- [ ] T019 [P] [FR1] Create observer_prompts schema in src/database/schemas/observer_prompts.py
-- [ ] T020 [P] [FR1] Create models schema in src/database/schemas/models.py
-- [ ] T020a [FR1] Populate models collection from old PromptGuard models collection (depends on T009 DB client; migrate 7 models with metadata: frontier, testing, observer_framing_compatible, rlhf, cost_per_1m_tokens; if insufficient models configured, halt with error message requiring manual validation)
-- [ ] T021 [P] [FR1] Create processing_failures schema in src/database/schemas/processing_failures.py
+- [X] T017 [P] [FR1] Create attacks schema in src/database/schemas/attacks.py
+- [X] T018 [P] [FR1] Create experiments schema in src/database/schemas/experiments.py
+- [X] T019 [P] [FR1] Create observer_prompts schema in src/database/schemas/observer_prompts.py
+- [X] T020 [P] [FR1] Create models schema in src/database/schemas/models.py
+- [X] T020a [FR1] Populate models collection from old PromptGuard models collection (depends on T009 DB client; migrate 7 models with metadata: frontier, testing, observer_framing_compatible, rlhf, cost_per_1m_tokens; if insufficient models configured, halt with error message requiring manual validation)
+- [X] T021 [P] [FR1] Create processing_failures schema in src/database/schemas/processing_failures.py
 
 ### Migration Implementation for FR1
 
-- [ ] T022 [FR1] Implement migration script in src/database/migrations/001_migrate_attacks.py (connect to old DB, extract 762 attacks, insert to PromptGuard2)
-- [ ] T023 [FR1] Add migration CLI command in src/cli/migrate.py with --verify flag
-- [ ] T024 [FR1] Create test fixture with 5 sample attacks in tests/fixtures/sample_attacks.json
+- [X] T022 [FR1] Implement migration script in src/database/migrations/001_migrate_attacks.py (connect to old DB, extract 762 attacks, insert to PromptGuard2)
+- [X] T023 [FR1] Add migration CLI command in src/cli/migrate.py with --verify flag
+- [X] T024 [FR1] Create test fixture with 5 sample attacks in tests/fixtures/sample_attacks.json
 
 ### Integration Test for FR1
 
-- [ ] T025 [FR1] Create migration integration test in tests/integration/test_migration.py (verify 762 count, label distribution, metadata integrity)
+- [X] T025 [FR1] Create migration integration test in tests/integration/test_migration.py (verify 762 count, label distribution, metadata integrity)
 
 **Checkpoint**: FR1 complete - 762 attacks available in PromptGuard2 for Step 1
 
@@ -91,21 +91,21 @@
 
 ### Database Schema for FR2
 
-- [ ] T026 [FR2] Create step1_baseline_responses schema in src/database/schemas/step1_baseline_responses.py
-- [ ] T026a [P] [FR3] Create gold_standard_classifications schema in src/database/schemas/gold_standard_classifications.py
+- [X] T026 [FR2] Create step1_baseline_responses schema in src/database/schemas/step1_baseline_responses.py
+- [X] T026a [P] [FR3] Create gold_standard_classifications schema in src/database/schemas/gold_standard_classifications.py
 
 ### Step 1 Implementation
 
-- [ ] T027 [P] [FR2] Create Step 1 baseline pipeline in src/evaluation/step1_baseline.py (async, 10 concurrent, checkpoint recovery)
-- [ ] T028 [P] [FR2] Create Step 1 CLI command in src/cli/step1.py with --test-mode, --samples, --resume, --full flags
-- [ ] T029 [FR2] Add interactive confirmation prompt after test-mode succeeds ("Proceed with full collection (3,810 evals)? [y/N]")
-- [ ] T030 [FR2] Implement checkpoint persistence per spec schema (data/experiments/{experiment_id}/checkpoint.json: {completed_attacks: [], failed_attempts: {}, started: ISO8601, last_updated: ISO8601}, atomic rename)
-- [ ] T031 [FR2] Implement progress logging (console output every 50 evaluations, ETA calculation)
-- [ ] T032 [FR2] Add OpenRouter metadata tagging (experiment_id, attack_id, step, evaluation_type)
+- [X] T027 [P] [FR2] Create Step 1 baseline pipeline in src/evaluation/step1_baseline.py (async, 10 concurrent, checkpoint recovery)
+- [X] T028 [P] [FR2] Create Step 1 CLI command in src/cli/step1.py with --test-mode, --samples, --resume, --full flags
+- [X] T029 [FR2] Add interactive confirmation prompt after test-mode succeeds ("Proceed with full collection (3,810 evals)? [y/N]")
+- [X] T030 [FR2] Implement checkpoint persistence per spec schema (data/experiments/{experiment_id}/checkpoint.json: {completed_attacks: [], failed_attempts: {}, started: ISO8601, last_updated: ISO8601}, atomic rename)
+- [X] T031 [FR2] Implement progress logging (console output every 50 evaluations, ETA calculation)
+- [X] T032 [FR2] Add OpenRouter metadata tagging (experiment_id, attack_id, step, evaluation_type)
 
 ### Integration Test for FR2
 
-- [ ] T033 [FR2] Create Step 1 integration test in tests/integration/test_step1_pipeline.py (real API calls on 5 samples, verify raw logging, cost tracking, checkpoint, fail-fast on data-spoiling errors - test with invalid API key expects EvaluationError, test with malformed response captures diagnostics and continues)
+- [X] T033 [FR2] Create Step 1 integration test in tests/integration/test_step1_pipeline.py (real API calls on 5 samples, verify raw logging, cost tracking, checkpoint, fail-fast on data-spoiling errors - test with invalid API key expects EvaluationError, test with malformed response captures diagnostics and continues)
 
 **Checkpoint**: FR2 complete - Step 1 baseline data collection functional
 
@@ -119,15 +119,15 @@
 
 ### Classification Implementation
 
-- [ ] T034 [P] [FR3] Create compliance classifier in src/evaluation/classifiers/compliance.py (uses Claude 4.5 Haiku, logs reasoning)
-- [ ] T035 [P] [FR3] Create compliance classifier prompt in src/evaluation/prompts/compliance_classifier.py
-- [ ] T036 [FR3] Implement gold standard annotation workflow (stratified sample: 50 attacks proportional to ground_truth distribution from 762 total, Claude annotates with reasoning, output CSV for Tony review, store in gold_standard_classifications collection as immutable data)
-- [ ] T037 [FR3] Implement automated classification with >90% agreement validation
-- [ ] T038 [FR3] Add reciprocal prompt auto-classification logic (ground_truth == "reciprocal" → "comply")
+- [X] T034 [P] [FR3] Create compliance classifier in src/evaluation/classifiers/compliance.py (uses Claude 4.5 Haiku, logs reasoning)
+- [X] T035 [P] [FR3] Create compliance classifier prompt in src/evaluation/prompts/compliance_classifier.py
+- [X] T036 [FR3] Implement gold standard annotation workflow (stratified sample: 50 attacks proportional to ground_truth distribution from 762 total, Claude annotates with reasoning, output CSV for Tony review, store in gold_standard_classifications collection as immutable data)
+- [X] T037 [FR3] Implement automated classification with >90% agreement validation
+- [X] T038 [FR3] Add reciprocal prompt auto-classification logic (ground_truth == "reciprocal" → "comply")
 
 ### Unit Test for FR3
 
-- [ ] T039 [FR3] Create compliance classifier unit test in tests/unit/test_compliance_classifier.py
+- [X] T039 [FR3] Create compliance classifier unit test in tests/unit/test_compliance_classifier.py
 
 **Checkpoint**: FR3 complete - Compliance classification functional
 
