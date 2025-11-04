@@ -15,6 +15,7 @@ import sys
 import csv
 import asyncio
 import os
+import yaml
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict
@@ -143,16 +144,27 @@ async def annotate_gold_standard(db, items: List[Dict]):
     if not api_key:
         raise ValueError("OPENROUTER_API_KEY not set")
 
-    classifier = ComplianceClassifier(openrouter_api_key=api_key, temperature=0.0)
-
-    # Raw logger for provenance
+    # Load classifier config
     project_root = Path(__file__).parent.parent.parent
-    raw_logger = RawLogger(
-        experiment_id="gold_standard_annotation",
-        log_dir=project_root / "data" / "experiments" / "gold_standard_annotation"
+    config_path = project_root / "config" / "experiments.yaml"
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    classifier_config = config["classifiers"]["compliance"]
+    classifier = ComplianceClassifier(
+        openrouter_api_key=api_key,
+        model=classifier_config["model"],
+        temperature=classifier_config.get("temperature", 0.0),
+        max_tokens=classifier_config.get("max_tokens", 1000)
     )
 
-    print("🤖 Annotating with Claude 4.5 Haiku...")
+    # Raw logger for provenance
+    raw_logger = RawLogger(
+        experiment_id="gold_standard_annotation",
+        data_dir=project_root / "data" / "experiments"
+    )
+
+    print(f"🤖 Annotating with {classifier_config['model']}...")
     print(f"Total items: {len(items)}\n")
 
     annotations = []
@@ -166,10 +178,10 @@ async def annotate_gold_standard(db, items: List[Dict]):
         try:
             result = await classifier.classify_for_gold_standard(
                 attack_prompt=attack["prompt_text"],
-                llm_response=response["llm_response"],
+                llm_response=response["response_text"],
                 ground_truth=attack["ground_truth"],
                 target_model=response["target_model"],
-                raw_logger=raw_logger.log_raw,
+                raw_logger=None,  # Skip raw logging for gold standard (data is in DB)
                 metadata={
                     "attack_id": attack["_key"],
                     "target_model": response["target_model"]
@@ -180,7 +192,7 @@ async def annotate_gold_standard(db, items: List[Dict]):
                 key=attack["_key"],
                 attack_id=attack["_key"],
                 prompt_text=attack["prompt_text"],
-                response_text=response["llm_response"],
+                response_text=response["response_text"],
                 ground_truth=attack["ground_truth"],
                 target_model=response["target_model"],
                 claude_classification=result.classification,
@@ -194,8 +206,12 @@ async def annotate_gold_standard(db, items: List[Dict]):
             print(f"✅ {result.classification}")
 
         except Exception as e:
-            print(f"❌ Error: {str(e)}")
-            raise  # Fail-fast
+            # Log error but continue - partial gold standard is useful
+            error_msg = str(e)
+            if len(error_msg) > 200:
+                error_msg = error_msg[:200] + "..."
+            print(f"❌ Error: {error_msg}")
+            # Continue to next item instead of failing fast
 
     # Insert to database
     print(f"\n💾 Inserting {len(annotations)} annotations to database...")
@@ -250,10 +266,10 @@ async def export_to_csv(db, output_path: str):
                 "attack_id": doc["_key"],
                 "ground_truth": doc["ground_truth"],
                 "target_model": doc["target_model"],
-                "prompt_text": doc["prompt_text"][:200] + "..." if len(doc["prompt_text"]) > 200 else doc["prompt_text"],
-                "response_text": doc["response_text"][:200] + "..." if len(doc["response_text"]) > 200 else doc["response_text"],
+                "prompt_text": doc["prompt_text"],
+                "response_text": doc["response_text"],
                 "claude_classification": doc["claude_classification"],
-                "claude_reasoning": doc["claude_reasoning"][:200] + "..." if len(doc["claude_reasoning"]) > 200 else doc["claude_reasoning"],
+                "claude_reasoning": doc["claude_reasoning"],
                 "tony_review_status": doc.get("tony_review_status", "pending"),
                 "tony_override": doc.get("tony_override", ""),
             })

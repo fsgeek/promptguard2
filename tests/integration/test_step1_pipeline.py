@@ -125,14 +125,15 @@ class TestStep1Pipeline:
         checkpoint_mgr.create()
         assert checkpoint_mgr.checkpoint_file.exists(), "Checkpoint not created"
 
-        # Mark attacks as completed
+        # Mark attack-model pairs as completed
+        test_model = "test/model-a"
         for attack_id in test_attack_ids[:2]:
-            checkpoint_mgr.mark_completed(attack_id)
+            checkpoint_mgr.mark_completed(attack_id, test_model)
 
         # Load checkpoint
         checkpoint = checkpoint_mgr.load()
-        assert len(checkpoint["completed_attacks"]) == 2
-        assert test_attack_ids[0] in checkpoint["completed_attacks"]
+        assert len(checkpoint["completed_pairs"]) == 2
+        assert f"{test_attack_ids[0]}_{test_model}" in checkpoint["completed_pairs"]
 
         # Verify atomic rename (tmp file should not exist after write)
         assert not checkpoint_mgr.temp_file.exists(), "Temp file not cleaned up"

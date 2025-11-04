@@ -47,6 +47,11 @@ class EvaluationError(Exception):
         self.raw_data = raw_data
         self.recoverable = recoverable
 
+    @property
+    def message(self) -> str:
+        """Get error message."""
+        return self.args[0] if self.args else ""
+
     def __str__(self) -> str:
         context_parts = []
         if self.attack_id:

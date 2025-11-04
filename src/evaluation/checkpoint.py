@@ -18,8 +18,8 @@ class CheckpointManager:
 
     Checkpoint schema (per spec.md NFR5):
     {
-        "completed_attacks": ["attack_001", "attack_002", ...],
-        "failed_attempts": {"attack_003": 2, "attack_004": 1},
+        "completed_pairs": ["attack_001_model_a", "attack_002_model_b", ...],
+        "failed_attempts": {"attack_003_model_a": 2, "attack_004_model_b": 1},
         "started": "2025-10-31T12:00:00Z",
         "last_updated": "2025-10-31T12:30:00Z"
     }
@@ -28,15 +28,15 @@ class CheckpointManager:
         manager = CheckpointManager(experiment_id="exp_phase1_step1_baseline_v1")
         manager.create()  # Initialize checkpoint
 
-        # Mark attack as completed
-        manager.mark_completed("attack_001")
+        # Mark attack-model pair as completed
+        manager.mark_completed("attack_001", "model_a")
 
-        # Mark attack as failed (with retry count)
-        manager.mark_failed("attack_002", retry_count=1)
+        # Mark attack-model pair as failed (with retry count)
+        manager.mark_failed("attack_002", "model_b", retry_count=1)
 
         # Load checkpoint on resume
         checkpoint = manager.load()
-        completed = checkpoint["completed_attacks"]
+        completed = checkpoint["completed_pairs"]
     """
 
     def __init__(self, experiment_id: str, data_dir: Optional[Path] = None):
@@ -73,7 +73,7 @@ class CheckpointManager:
             )
 
         checkpoint = {
-            "completed_attacks": [],
+            "completed_pairs": [],
             "failed_attempts": {},
             "started": datetime.now(timezone.utc).isoformat(),
             "last_updated": datetime.now(timezone.utc).isoformat(),
@@ -100,77 +100,83 @@ class CheckpointManager:
         with open(self.checkpoint_file, 'r') as f:
             return json.load(f)
 
-    def mark_completed(self, attack_id: str) -> None:
+    def mark_completed(self, attack_id: str, model: str) -> None:
         """
-        Mark attack as completed.
+        Mark attack-model pair as completed.
 
         Args:
             attack_id: Attack identifier
+            model: Model identifier
 
         Raises:
             FileNotFoundError: If checkpoint doesn't exist
         """
         checkpoint = self.load()
+        pair_key = f"{attack_id}_{model}"
 
-        if attack_id not in checkpoint["completed_attacks"]:
-            checkpoint["completed_attacks"].append(attack_id)
+        if pair_key not in checkpoint["completed_pairs"]:
+            checkpoint["completed_pairs"].append(pair_key)
 
         # Remove from failed attempts if present
-        if attack_id in checkpoint["failed_attempts"]:
-            del checkpoint["failed_attempts"][attack_id]
+        if pair_key in checkpoint["failed_attempts"]:
+            del checkpoint["failed_attempts"][pair_key]
 
         checkpoint["last_updated"] = datetime.now(timezone.utc).isoformat()
         self._write_atomic(checkpoint)
 
-    def mark_failed(self, attack_id: str, retry_count: int = 1) -> None:
+    def mark_failed(self, attack_id: str, model: str, retry_count: int = 1) -> None:
         """
-        Mark attack as failed with retry count.
+        Mark attack-model pair as failed with retry count.
 
         Args:
             attack_id: Attack identifier
+            model: Model identifier
             retry_count: Number of failed attempts
 
         Raises:
             FileNotFoundError: If checkpoint doesn't exist
         """
         checkpoint = self.load()
+        pair_key = f"{attack_id}_{model}"
 
-        checkpoint["failed_attempts"][attack_id] = retry_count
+        checkpoint["failed_attempts"][pair_key] = retry_count
         checkpoint["last_updated"] = datetime.now(timezone.utc).isoformat()
 
         self._write_atomic(checkpoint)
 
-    def is_completed(self, attack_id: str) -> bool:
+    def is_completed(self, attack_id: str, model: str) -> bool:
         """
-        Check if attack is already completed.
+        Check if attack-model pair is already completed.
 
         Args:
             attack_id: Attack identifier
+            model: Model identifier
 
         Returns:
-            True if attack is in completed_attacks list
+            True if attack-model pair is in completed_pairs list
         """
         try:
             checkpoint = self.load()
-            return attack_id in checkpoint["completed_attacks"]
+            pair_key = f"{attack_id}_{model}"
+            return pair_key in checkpoint["completed_pairs"]
         except FileNotFoundError:
             return False
 
-    def get_failed_attacks(self, max_retries: int = 3) -> List[str]:
+    def get_failed_pairs(self, max_retries: int = 3) -> List[str]:
         """
-        Get attacks that failed but haven't exceeded max retries.
+        Get attack-model pairs that failed but haven't exceeded max retries.
 
         Args:
             max_retries: Maximum retry attempts
 
         Returns:
-            List of attack IDs eligible for retry
+            List of attack-model pair keys eligible for retry
         """
         try:
             checkpoint = self.load()
             return [
-                attack_id
-                for attack_id, count in checkpoint["failed_attempts"].items()
+                pair_key
+                for pair_key, count in checkpoint["failed_attempts"].items()
                 if count < max_retries
             ]
         except FileNotFoundError:
@@ -186,7 +192,7 @@ class CheckpointManager:
         try:
             checkpoint = self.load()
             return {
-                "completed_count": len(checkpoint["completed_attacks"]),
+                "completed_count": len(checkpoint["completed_pairs"]),
                 "failed_count": len(checkpoint["failed_attempts"]),
                 "started": checkpoint["started"],
                 "last_updated": checkpoint["last_updated"],

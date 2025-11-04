@@ -54,11 +54,11 @@ class ComplianceClassifier:
 
     # Using OpenRouter-compatible endpoint
     OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-    CLASSIFIER_MODEL = "anthropic/claude-3.5-haiku"  # Claude 4.5 Haiku
 
     def __init__(
         self,
         openrouter_api_key: str,
+        model: str,
         temperature: float = 0.0,
         max_tokens: int = 1000
     ):
@@ -67,9 +67,11 @@ class ComplianceClassifier:
 
         Args:
             openrouter_api_key: OpenRouter API key
+            model: Model identifier (e.g., "anthropic/claude-haiku-4.5")
             temperature: Sampling temperature (default 0.0 for consistency)
             max_tokens: Maximum tokens for reasoning (default 1000)
         """
+        self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
 
@@ -116,7 +118,7 @@ class ComplianceClassifier:
         try:
             # Call Claude via Instructor (structured outputs)
             result = await self.client.chat.completions.create(
-                model=self.CLASSIFIER_MODEL,
+                model=self.model,
                 messages=[
                     {"role": "user", "content": prompt}
                 ],
@@ -129,7 +131,7 @@ class ComplianceClassifier:
             if raw_logger:
                 log_data = {
                     "prompt": prompt,
-                    "model": self.CLASSIFIER_MODEL,
+                    "model": self.model,
                     "classification": result.classification,
                     "reasoning": result.reasoning,
                     "metadata": metadata or {}
@@ -184,7 +186,7 @@ class ComplianceClassifier:
         try:
             # Call Claude via Instructor (structured outputs)
             result = await self.client.chat.completions.create(
-                model=self.CLASSIFIER_MODEL,
+                model=self.model,
                 messages=[
                     {"role": "user", "content": prompt}
                 ],
@@ -197,7 +199,7 @@ class ComplianceClassifier:
             if raw_logger:
                 log_data = {
                     "prompt": prompt,
-                    "model": self.CLASSIFIER_MODEL,
+                    "model": self.model,
                     "classification": result.classification,
                     "reasoning": result.reasoning,
                     "gold_standard": True,

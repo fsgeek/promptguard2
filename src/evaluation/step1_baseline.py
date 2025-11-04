@@ -115,7 +115,17 @@ class Step1Pipeline(EvaluationPipeline):
                 )
 
             # 3. Parse response
-            response_text = response.choices[0]["message"]["content"]
+            if not response.choices or len(response.choices) == 0:
+                raise EvaluationError(
+                    message="API returned empty choices array",
+                    attack_id=attack_id,
+                    model=target_model,
+                    stage="parsing",
+                    raw_data=response.raw_response,
+                    recoverable=True,
+                )
+
+            response_text = response.choices[0].get("message", {}).get("content", "")
 
             # 4. Store to database
             response_doc = {
@@ -142,7 +152,7 @@ class Step1Pipeline(EvaluationPipeline):
 
             # Update checkpoint
             if self.config.checkpoint_enabled:
-                self.checkpoint.mark_completed(attack_id)
+                self.checkpoint.mark_completed(attack_id, target_model)
 
             return EvaluationResult(
                 attack_id=attack_id,
@@ -218,13 +228,52 @@ async def run_step1_baseline(
         results = []
         for attack in attacks:
             for model in target_models:
-                result = await pipeline.evaluate_single(
-                    attack_id=attack["attack_id"],
-                    prompt_text=attack["prompt_text"],
-                    ground_truth=attack["ground_truth"],
-                    target_model=model,
-                )
-                results.append(result)
+                # Skip if already completed (resume logic)
+                if config.checkpoint_enabled and pipeline.checkpoint.is_completed(attack["attack_id"], model):
+                    continue
+
+                try:
+                    result = await pipeline.evaluate_single(
+                        attack_id=attack["attack_id"],
+                        prompt_text=attack["prompt_text"],
+                        ground_truth=attack["ground_truth"],
+                        target_model=model,
+                    )
+                    results.append(result)
+
+                    # Update counters for stats tracking
+                    if result.success:
+                        pipeline.completed_count += 1
+                    else:
+                        pipeline.error_count += 1
+
+                except EvaluationError as e:
+                    # Handle recoverable errors - log and continue
+                    if e.recoverable:
+                        print(f"⚠ Recoverable error: {e.message} [attack={e.attack_id}, model={e.model}]")
+                        pipeline.error_count += 1
+
+                        # Log to processing_failures collection
+                        db.collection("processing_failures").insert({
+                            "attack_id": e.attack_id,
+                            "experiment_id": config.experiment_id,
+                            "model": e.model,
+                            "stage": e.stage,
+                            "error_message": e.message,
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                        })
+
+                        # Create failed result
+                        results.append(EvaluationResult(
+                            attack_id=attack["attack_id"],
+                            success=False,
+                            raw_logged=False,
+                            error=e.message,
+                        ))
+                        continue
+                    else:
+                        # Non-recoverable error - halt pipeline
+                        raise
 
         return {
             "completed": len([r for r in results if r.success]),

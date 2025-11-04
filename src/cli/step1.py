@@ -35,9 +35,30 @@ async def main_async():
         if idx + 1 < len(sys.argv):
             samples = int(sys.argv[idx + 1])
 
+    # Parse --config PATH
+    config_file = "experiments.yaml"  # Default
+    if "--config" in sys.argv:
+        idx = sys.argv.index("--config")
+        if idx + 1 < len(sys.argv):
+            config_file = sys.argv[idx + 1]
+
+    # Parse --attack-id ATTACK_ID (for surgical recovery)
+    filter_attack_id = None
+    if "--attack-id" in sys.argv:
+        idx = sys.argv.index("--attack-id")
+        if idx + 1 < len(sys.argv):
+            filter_attack_id = sys.argv[idx + 1]
+
+    # Parse --model MODEL (for surgical recovery)
+    filter_model = None
+    if "--model" in sys.argv:
+        idx = sys.argv.index("--model")
+        if idx + 1 < len(sys.argv):
+            filter_model = sys.argv[idx + 1]
+
     # Load configuration
     project_root = Path(__file__).parent.parent.parent
-    config_path = project_root / "config" / "experiments.yaml"
+    config_path = project_root / "config" / config_file
 
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
@@ -72,7 +93,11 @@ async def main_async():
         return
 
     # Get attacks to evaluate
-    if test_mode:
+    if filter_attack_id:
+        # Surgical mode: specific attack
+        attack_ids = [filter_attack_id]
+        print(f"\n🎯 SURGICAL MODE: Attack {filter_attack_id}")
+    elif test_mode:
         print(f"\n🧪 TEST MODE: Evaluating {samples} samples")
         # Get random sample
         aql = f"""
@@ -83,19 +108,21 @@ async def main_async():
         cursor = db.aql.execute(aql)
         attack_ids = list(cursor)
     elif resume:
-        # Get incomplete attacks from checkpoint
+        # Get all attacks - pair-level resume handled in evaluation loop
         checkpoint = checkpoint_mgr.load()
-        completed = set(checkpoint["completed_attacks"])
+        completed_pairs = set(checkpoint["completed_pairs"])
 
         aql = """
         FOR attack IN attacks
             RETURN attack._key
         """
         cursor = db.aql.execute(aql)
-        all_attacks = set(cursor)
+        attack_ids = list(cursor)
 
-        attack_ids = list(all_attacks - completed)
-        print(f"\n🔄 RESUME MODE: {len(attack_ids)} attacks remaining")
+        # Calculate remaining evaluations
+        total_pairs = len(attack_ids) * len(target_models)
+        remaining = total_pairs - len(completed_pairs)
+        print(f"\n🔄 RESUME MODE: {remaining} evaluations remaining ({len(completed_pairs)} already completed)")
     else:
         # Full collection
         aql = """
@@ -104,6 +131,11 @@ async def main_async():
         """
         cursor = db.aql.execute(aql)
         attack_ids = list(cursor)
+
+    # Apply model filter if specified
+    if filter_model:
+        target_models = [filter_model]
+        print(f"🎯 Model filter: {filter_model}")
 
     total_evaluations = len(attack_ids) * len(target_models)
 
@@ -124,8 +156,9 @@ async def main_async():
             parameters=experiment_config["parameters"],
         )
 
-    # Create checkpoint if not resuming
-    if not resume:
+    # Create checkpoint if not resuming (skip for surgical mode)
+    surgical_mode = filter_attack_id is not None or filter_model is not None
+    if not resume and not surgical_mode:
         try:
             checkpoint_mgr.create()
         except FileExistsError:

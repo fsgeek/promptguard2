@@ -33,7 +33,7 @@ class OpenRouterResponse(BaseModel):
     id: str
     model: str
     choices: List[Dict[str, Any]]
-    usage: Dict[str, int]
+    usage: Dict[str, Any]  # Changed from Dict[str, int] to support nested structures like completion_tokens_details
     raw_response: Dict[str, Any] = Field(..., description="Complete raw API response")
 
 
@@ -124,10 +124,10 @@ class OpenRouterClient:
             raw_response = response.json()
 
             return OpenRouterResponse(
-                id=raw_response["id"],
-                model=raw_response["model"],
-                choices=raw_response["choices"],
-                usage=raw_response["usage"],
+                id=raw_response.get("id", "unknown"),  # Handle missing id field
+                model=raw_response.get("model", "unknown"),
+                choices=raw_response.get("choices", []),
+                usage=raw_response.get("usage", {}),
                 raw_response=raw_response,
             )
 
