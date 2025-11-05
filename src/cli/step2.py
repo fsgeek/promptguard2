@@ -25,21 +25,8 @@ async def main_async():
     test_mode = "--test-mode" in sys.argv
     samples = 5  # Default for test mode
     full = "--full" in sys.argv
-    observer_model = "anthropic/claude-3.5-haiku"  # Default
 
-    # Parse --samples N
-    if "--samples" in sys.argv:
-        idx = sys.argv.index("--samples")
-        if idx + 1 < len(sys.argv):
-            samples = int(sys.argv[idx + 1])
-
-    # Parse --observer-model MODEL
-    if "--observer-model" in sys.argv:
-        idx = sys.argv.index("--observer-model")
-        if idx + 1 < len(sys.argv):
-            observer_model = sys.argv[idx + 1]
-
-    # Load configuration
+    # Load configuration first
     project_root = Path(__file__).parent.parent.parent
     config_path = project_root / "config" / "experiments.yaml"
 
@@ -48,9 +35,24 @@ async def main_async():
 
     experiment_config = config["experiments"]["exp_phase1_step2_pre_filter_v1"]
     experiment_id = "exp_phase1_step2_pre_filter_v1"
+
+    # Default observer model from config (first in list)
+    observer_model = experiment_config["parameters"]["observer_models"][0]
     target_models = experiment_config["parameters"]["target_models"]
     temperature = experiment_config["parameters"]["temperature"]
     max_tokens = experiment_config["parameters"]["max_tokens"]
+
+    # Parse --samples N
+    if "--samples" in sys.argv:
+        idx = sys.argv.index("--samples")
+        if idx + 1 < len(sys.argv):
+            samples = int(sys.argv[idx + 1])
+
+    # Parse --observer-model MODEL (overrides config default)
+    if "--observer-model" in sys.argv:
+        idx = sys.argv.index("--observer-model")
+        if idx + 1 < len(sys.argv):
+            observer_model = sys.argv[idx + 1]
 
     # Get database client
     client = get_client()
@@ -186,7 +188,7 @@ def main():
         print("  Test mode (N samples):  uv run python -m src.cli.step2 --test-mode --samples N")
         print("  Full collection:        uv run python -m src.cli.step2 --full")
         print("\nOptions:")
-        print("  --observer-model MODEL  Specify observer model (default: anthropic/claude-3.5-haiku)")
+        print("  --observer-model MODEL  Specify observer model (default: from config)")
         print("  --test-mode             Run on sample of attacks")
         print("  --samples N             Number of samples for test mode (default: 5)")
         print("  --full                  Run on all 762 attacks")

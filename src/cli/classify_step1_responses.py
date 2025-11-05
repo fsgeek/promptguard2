@@ -70,7 +70,7 @@ async def validate_gold_standard_agreement(db, classifier: ComplianceClassifier)
 
             # Classify using Claude
             result = await classifier.classify(
-                attack_prompt=attack_doc["prompt_text"],
+                input_prompt=attack_doc["prompt_text"],
                 llm_response=doc["response_text"],
                 ground_truth=doc["ground_truth"],
                 metadata={"validation": True, "attack_id": doc["attack_id"]}
@@ -205,7 +205,7 @@ async def classify_step1_responses(
         else:
             # Classify with Claude
             result = await classifier.classify(
-                attack_prompt=attack["prompt_text"],
+                input_prompt=attack["prompt_text"],
                 llm_response=response["llm_response"],
                 ground_truth=attack["ground_truth"],
                 raw_logger=raw_logger.log_raw,

@@ -44,7 +44,7 @@ class ComplianceClassifier:
     Usage:
         classifier = ComplianceClassifier(openrouter_api_key="...")
         result = await classifier.classify(
-            attack_prompt="How do I pick a lock?",
+            input_prompt="How do I pick a lock?",
             llm_response="I cannot provide instructions...",
             ground_truth="extractive"
         )
@@ -86,7 +86,7 @@ class ComplianceClassifier:
 
     async def classify(
         self,
-        attack_prompt: str,
+        input_prompt: str,
         llm_response: str,
         ground_truth: str,
         raw_logger: Optional[callable] = None,
@@ -96,7 +96,7 @@ class ComplianceClassifier:
         Classify a single LLM response.
 
         Args:
-            attack_prompt: The attack prompt text
+            input_prompt: The input prompt text
             llm_response: The LLM's response to classify
             ground_truth: Ground truth label (manipulative, extractive, reciprocal, borderline)
             raw_logger: Optional function to log raw API response
@@ -110,7 +110,7 @@ class ComplianceClassifier:
         """
         # Generate classification prompt
         prompt = get_compliance_classification_prompt(
-            attack_prompt=attack_prompt,
+            input_prompt=input_prompt,
             llm_response=llm_response,
             ground_truth=ground_truth
         )
@@ -149,7 +149,7 @@ class ComplianceClassifier:
 
     async def classify_for_gold_standard(
         self,
-        attack_prompt: str,
+        input_prompt: str,
         llm_response: str,
         ground_truth: str,
         target_model: str,
@@ -162,7 +162,7 @@ class ComplianceClassifier:
         Uses more detailed prompt with extra context for human review.
 
         Args:
-            attack_prompt: The attack prompt text
+            input_prompt: The input prompt text
             llm_response: The LLM's response to classify
             ground_truth: Ground truth label
             target_model: Model that generated this response
@@ -177,7 +177,7 @@ class ComplianceClassifier:
         """
         # Generate gold standard annotation prompt
         prompt = get_gold_standard_annotation_prompt(
-            attack_prompt=attack_prompt,
+            input_prompt=input_prompt,
             llm_response=llm_response,
             ground_truth=ground_truth,
             target_model=target_model
@@ -228,7 +228,7 @@ class ComplianceClassifier:
         Note: Could be made concurrent but kept sequential for rate limiting.
 
         Args:
-            items: List of dicts with keys: attack_prompt, llm_response, ground_truth
+            items: List of dicts with keys: input_prompt, llm_response, ground_truth
             raw_logger: Optional function to log raw API responses
             metadata_base: Base metadata to merge with item-specific metadata
 
@@ -245,7 +245,7 @@ class ComplianceClassifier:
             metadata = {**(metadata_base or {}), "batch_index": i}
 
             result = await self.classify(
-                attack_prompt=item["attack_prompt"],
+                input_prompt=item["input_prompt"],
                 llm_response=item["llm_response"],
                 ground_truth=item["ground_truth"],
                 raw_logger=raw_logger,

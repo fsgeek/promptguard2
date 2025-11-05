@@ -177,7 +177,7 @@ async def annotate_gold_standard(db, items: List[Dict]):
 
         try:
             result = await classifier.classify_for_gold_standard(
-                attack_prompt=attack["prompt_text"],
+                input_prompt=attack["prompt_text"],
                 llm_response=response["response_text"],
                 ground_truth=attack["ground_truth"],
                 target_model=response["target_model"],
