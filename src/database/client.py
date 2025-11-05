@@ -14,6 +14,9 @@ from arango.database import StandardDatabase
 from arango.exceptions import ArangoError
 from pathlib import Path
 
+# Import the new schema
+from .schemas.adversarial_prompts import AdversarialPrompt
+
 
 class DatabaseClient:
     """
@@ -115,6 +118,35 @@ class DatabaseClient:
                 )
 
         return self._old_db
+
+    def get_adversarial_prompts_collection(self):
+        """
+        Get or create the 'adversarial_prompts' collection.
+        """
+        db = self.get_database()
+        collection_name = "adversarial_prompts"
+        if not db.has_collection(collection_name):
+            db.create_collection(collection_name)
+        return db.collection(collection_name)
+
+    def get_raw_dataset_collection(self, dataset_name: str):
+        """
+        Get or create a collection for a raw dataset.
+        """
+        db = self.get_database()
+        collection_name = f"{dataset_name}_raw_prompts"
+        if not db.has_collection(collection_name):
+            db.create_collection(collection_name)
+        return db.collection(collection_name)
+
+    def get_edge_collection(self, collection_name: str):
+        """
+        Get or create an edge collection.
+        """
+        db = self.get_database()
+        if not db.has_collection(collection_name):
+            db.create_collection(collection_name, edge=True)
+        return db.collection(collection_name)
 
     def verify_connections(self) -> tuple[bool, bool]:
         """

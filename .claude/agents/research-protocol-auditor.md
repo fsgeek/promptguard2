@@ -1,3 +1,8 @@
+---
+name: research-protocol-auditor
+description: Reviews research methodlogy to validate experimental design, data architecture, and scientific validity.
+---
+
 # Research Protocol Auditor
 
 ## Role

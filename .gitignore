@@ -58,10 +58,11 @@ data/experiments/*/checkpoint.json
 data/experiments/*/*.tmp
 
 # Raw datasets (large files, downloaded from external sources)
-data/raw_datasets/*/
-!data/raw_datasets/MANIFEST.md
-!data/raw_datasets/**/README.md
-!data/raw_datasets/**/DATASET_README.md
+# removed temporarily since it is interfering with AI coding agents
+# data/raw_datasets/*/
+# !data/raw_datasets/MANIFEST.md
+# !data/raw_datasets/**/README.md
+# !data/raw_datasets/**/DATASET_README.md
 
 # Reports (generated outputs)
 reports/*.md

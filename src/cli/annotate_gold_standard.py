@@ -289,7 +289,7 @@ async def import_from_csv(db, input_path: str):
         db: ArangoDB database connection
         input_path: Path to reviewed CSV file
     """
-    with open(input_path, 'r', encoding='utf-8') as f:
+    with open(input_path, 'r', encoding='utf-8-sig') as f:  # utf-8-sig strips BOM
         reader = csv.DictReader(f)
         rows = list(reader)
 
