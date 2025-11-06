@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from arango.collection import StandardCollection
 from pydantic import ValidationError
+from datasets import load_dataset
 
 from src.database.client import get_client
 from src.database.schemas.adversarial_prompts import AdversarialPrompt
@@ -1287,6 +1288,92 @@ def ingest_alert_dataset(normalized_collection: StandardCollection, raw_collecti
 
 
 
+from datasets import load_dataset
+
+
+def ingest_jailbreakbench_dataset(normalized_collection: StandardCollection, raw_collection: StandardCollection, edge_collection: StandardCollection, dataset_path: Path):
+    """Ingest data from the JailbreakBench dataset."""
+    print(f"Ingesting JailbreakBench dataset from Hugging Face")
+    
+    success_count = 0
+    failure_count = 0
+    BATCH_SIZE = 1000
+
+    for split in ["harmful", "benign"]:
+        print(f"Processing split: {split}")
+        try:
+            dataset = load_dataset("dedeswim/JBB-Behaviors", "behaviors", split=split)
+            df = dataset.to_pandas()
+            df = df.drop(columns=["Index"])
+
+            for i in range(0, len(df), BATCH_SIZE):
+                df_batch = df.iloc[i:i + BATCH_SIZE]
+                success_count, failure_count = process_jailbreakbench_batch(df_batch, normalized_collection, raw_collection, edge_collection, dataset_path, success_count, failure_count, split)
+        except Exception as e:
+            print(f"Error processing split {split}: {e}")
+
+    print(f"Finished ingesting JailbreakBench dataset.")
+    print(f"Summary: {success_count} successful, {failure_count} failed.")
+
+
+def process_jailbreakbench_batch(df_batch: pd.DataFrame, normalized_collection: StandardCollection, raw_collection: StandardCollection, edge_collection: StandardCollection, dataset_path: Path, success_count: int, failure_count: int, split: str):
+    raw_records_to_insert = []
+    normalized_prompts_to_insert = []
+    edges_to_insert = []
+
+    for _, record in df_batch.iterrows():
+        record_dict = record.to_dict()
+        raw_key = str(uuid.uuid4())
+        record_dict['_key'] = raw_key
+        raw_records_to_insert.append(record_dict)
+
+        try:
+            normalized_key = str(uuid.uuid4())
+            adversarial_prompt = AdversarialPrompt(
+                source_dataset="jailbreakbench",
+                source_file="dedeswim/JBB-Behaviors",
+                split=split,
+                attack_type="jailbreak",
+                domain=record_dict.get("Category"),
+                prompt=record_dict.get("Goal"),
+                expected_output=record_dict.get("Target"),
+                user_task=record_dict.get("Behavior"),
+                tags=[record_dict.get("Source")],
+                is_adversarial=(split == "harmful"),
+                raw_record_link=f"{raw_collection.name}/{raw_key}"
+            )
+            
+            normalized_dict = adversarial_prompt.model_dump()
+            normalized_dict['_key'] = normalized_key
+            normalized_prompts_to_insert.append(normalized_dict)
+
+            edges_to_insert.append({
+                "_from": f"{normalized_collection.name}/{normalized_key}",
+                "_to": f"{raw_collection.name}/{raw_key}"
+            })
+        except ValidationError as e:
+            failure_count += 1
+            print(f"--- VALIDATION FAILURE ---")
+            print(f"Record: {record_dict}")
+            print(f"Error: {e}")
+            print(f"--------------------------")
+
+    if raw_records_to_insert:
+        raw_results = raw_collection.import_bulk(raw_records_to_insert, on_duplicate='ignore')
+        success_count += raw_results['created']
+        failure_count += raw_results['errors']
+    
+    if normalized_prompts_to_insert:
+        norm_results = normalized_collection.import_bulk(normalized_prompts_to_insert, on_duplicate='ignore')
+        failure_count += norm_results['errors']
+
+    if edges_to_insert:
+        edge_results = edge_collection.import_bulk(edges_to_insert, on_duplicate='ignore')
+        failure_count += edge_results['errors']
+
+    return success_count, failure_count
+
+
 def main():
 
 
@@ -1612,6 +1699,7 @@ def main():
 
 
         "alert": ingest_alert_dataset,
+        "jailbreakbench": ingest_jailbreakbench_dataset,
 
 
 

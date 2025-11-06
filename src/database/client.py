@@ -28,12 +28,13 @@ class DatabaseClient:
         old_db = client.get_old_database()  # Old PromptGuard (for migration)
     """
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None, request_timeout: int = 300):
         """
         Initialize database client.
 
         Args:
             config_path: Path to database.yaml config file
+            request_timeout: Timeout for HTTP requests in seconds.
         """
         if config_path is None:
             # Default to config/database.yaml in project root
@@ -41,7 +42,7 @@ class DatabaseClient:
             config_path = project_root / "config" / "database.yaml"
 
         self.config = self._load_config(config_path)
-        self.client = ArangoClient(hosts=f"http://{self.config['database']['host']}:{self.config['database']['port']}")
+        self.client = ArangoClient(hosts=f"http://{self.config['database']['host']}:{self.config['database']['port']}", request_timeout=request_timeout)
 
         # Password from environment variable (Constitutional Principle VI)
         self.password = os.getenv("ARANGODB_PROMPTGUARD_PASSWORD")
@@ -198,5 +199,5 @@ def get_client() -> DatabaseClient:
     """
     global _client_instance
     if _client_instance is None:
-        _client_instance = DatabaseClient()
+        _client_instance = DatabaseClient(request_timeout=300)
     return _client_instance
