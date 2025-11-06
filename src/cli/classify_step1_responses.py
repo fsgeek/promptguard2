@@ -17,13 +17,13 @@ Usage:
 import sys
 import asyncio
 import os
+import yaml
 from pathlib import Path
 from typing import Dict, List
 from datetime import datetime
 
 from src.database.client import get_client
 from src.evaluation.classifiers.compliance import ComplianceClassifier
-from src.logging.raw_logger import RawLogger
 
 
 async def validate_gold_standard_agreement(db, classifier: ComplianceClassifier) -> Dict:
@@ -167,13 +167,6 @@ async def classify_step1_responses(
     total = len(responses)
     print(f"\n🏷️  Classifying {total} Step 1 baseline responses...")
 
-    # Raw logger for provenance
-    project_root = Path(__file__).parent.parent.parent
-    raw_logger = RawLogger(
-        experiment_id="step1_classification",
-        log_dir=project_root / "data" / "experiments" / "step1_classification"
-    )
-
     # Statistics
     reciprocal_count = 0
     claude_count = 0
@@ -192,23 +185,13 @@ async def classify_step1_responses(
             reciprocal_count += 1
             print(f"[{i}/{total}] {attack_id}: reciprocal → comply (auto)")
 
-            # Log to raw logger
-            await raw_logger.log_raw({
-                "attack_id": attack_id,
-                "target_model": response["target_model"],
-                "classification": classification,
-                "reasoning": reasoning,
-                "auto_classified": True,
-                "ground_truth": "reciprocal"
-            })
-
         else:
             # Classify with Claude
             result = await classifier.classify(
                 input_prompt=attack["prompt_text"],
-                llm_response=response["llm_response"],
+                llm_response=response["response_text"],
                 ground_truth=attack["ground_truth"],
-                raw_logger=raw_logger.log_raw,
+                raw_logger=None,  # Skip raw logging (data is in DB)
                 metadata={
                     "attack_id": attack_id,
                     "target_model": response["target_model"]
@@ -219,13 +202,21 @@ async def classify_step1_responses(
             claude_count += 1
             print(f"[{i}/{total}] {attack_id}: {classification} (Claude)")
 
-        # Update response with classification
-        db.collection("step1_baseline_responses").update(
-            {"_key": response["_key"]},
-            {
-                "compliance_classification": classification,
-                "classification_reasoning": reasoning,
-                "classified_at": datetime.utcnow().isoformat() + "Z"
+        # Update response with classification (using AQL - collection.update() doesn't work)
+        db.aql.execute(
+            '''
+            UPDATE {_key: @key}
+            WITH {
+                compliance_classification: @classification,
+                classification_reasoning: @reasoning,
+                classified_at: @classified_at
+            } IN step1_baseline_responses
+            ''',
+            bind_vars={
+                'key': response["_key"],
+                'classification': classification,
+                'reasoning': reasoning,
+                'classified_at': datetime.utcnow().isoformat() + "Z"
             }
         )
 
@@ -270,8 +261,21 @@ async def main_async():
     if not api_key:
         raise ValueError("OPENROUTER_API_KEY not set")
 
+    # Load classifier config
+    project_root = Path(__file__).parent.parent.parent
+    config_path = project_root / "config" / "experiments.yaml"
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    classifier_config = config["classifiers"]["compliance"]
+
     # Initialize classifier
-    classifier = ComplianceClassifier(openrouter_api_key=api_key, temperature=0.0)
+    classifier = ComplianceClassifier(
+        openrouter_api_key=api_key,
+        model=classifier_config["model"],
+        temperature=classifier_config.get("temperature", 0.0),
+        max_tokens=classifier_config.get("max_tokens", 8192)
+    )
 
     if validate_only:
         # Validate against gold standard
