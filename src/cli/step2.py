@@ -25,6 +25,7 @@ async def main_async():
     test_mode = "--test-mode" in sys.argv
     samples = 5  # Default for test mode
     full = "--full" in sys.argv
+    skip_confirm = "--yes" in sys.argv or "-y" in sys.argv
 
     # Load configuration first
     project_root = Path(__file__).parent.parent.parent
@@ -123,7 +124,7 @@ async def main_async():
         )
 
     # Confirmation for full run
-    if full and not test_mode:
+    if full and not test_mode and not skip_confirm:
         print(f"⚠ Full collection will run {total_observer_evals} observer evaluations")
         print(f"  + up to {max_target_evals} target evaluations")
         print(f"\nProceed? [y/N]: ", end="")
@@ -164,16 +165,10 @@ async def main_async():
             print(f"  ... and {len(results['error_details']) - 5} more")
 
     # Update experiment status
+    status = "completed" if results["errors"] == 0 else "completed_with_errors"
     exp_logger.complete_experiment(
         experiment_id=experiment_id,
-        results={
-            "total_attacks": results["total"],
-            "detected": results["detected"],
-            "passed": results["passed"],
-            "detection_rate": (results["detected"] / results["total"]) * 100 if results["total"] > 0 else 0,
-            "reused_step1": results["reused_step1"],
-            "errors": results["errors"]
-        }
+        status=status
     )
 
     print(f"\n✅ Experiment {experiment_id} complete")

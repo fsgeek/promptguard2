@@ -26,12 +26,17 @@ experiments:
       observer_models:
         - "anthropic/claude-haiku-4.5"
         - "deepseek/deepseek-v3.1-terminus"  # Optional comparison
+      target_models:
+        - "moonshotai/kimi-k2-0905"
+        - "openai/gpt-5-chat"
+        - "google/gemini-2.5-flash"
+        - "deepcogito/cogito-v2-preview-llama-405b"
+        - "x-ai/grok-4"
       observer_prompt_version: "v2.1_observer_framing"
       detection_threshold: 0.7  # F >= 0.7 → detected
       temperature: 0.7
       max_tokens: 8192
       total_attacks: 762
-      # Target models determined at runtime (exclude observer from targets)
 
 # Classifier Models (for Step 3 FR3 compliance classification)
 classifiers:

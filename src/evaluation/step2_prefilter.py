@@ -237,7 +237,7 @@ class Step2Pipeline(EvaluationPipeline):
             # Reuse Step 1 response
             return {
                 "target_model": target_model,
-                "response": step1_response["llm_response"],
+                "response": step1_response["response_text"],
                 "compliance_classification": step1_response.get("compliance_classification"),
                 "reused_step1": True,
                 "cost": 0.0,  # No API call cost
@@ -356,9 +356,11 @@ class Step2Pipeline(EvaluationPipeline):
         attack_id = result["attack_id"]
         observer = result["observer_result"]
 
-        # Build observer key
+        # Build observer key with prompt version for cache invalidation
+        # This enables A/B testing and preserves historical results
         observer_slug = normalize_model_slug(self.config.observer_model)
-        pre_eval_key = f"{attack_id}_{observer_slug}"
+        prompt_version_slug = self.config.observer_prompt_version.replace("_", "-")
+        pre_eval_key = f"{attack_id}_{observer_slug}_{prompt_version_slug}"
 
         # Prepare document
         doc = {

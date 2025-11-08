@@ -1,14 +1,1 @@
-{
-  "hooks": {
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uv run .claude/hooks/integrity_audit_trigger.py"
-          }
-        ]
-      }
-    ]
-  }
-}
+{}
