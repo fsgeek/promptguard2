@@ -1,8 +1,9 @@
 # PromptGuard Research Protocol
 
-**Version:** 2.1.0
-**Date:** 2025-10-31
+**Version:** 2.2.0
+**Date:** 2025-11-08
 **Status:** Modular iterative design - each phase is independently publishable
+**Last Updated:** Phase 1 split into Phase 1A (contaminated baseline) and Phase 1B (curated research)
 
 ---
 
@@ -23,10 +24,17 @@ PromptGuard is a research instrument studying whether AI can learn to protect it
 ### Modular Phase Design
 
 ```
-PHASE 1 (Minimum Viable Research):
-  Step 1: Baseline LLM Behavior (no filter)
-  Step 2: Pre-filter + LLM (observer framing)
+PHASE 1A (Dataset Quality Baseline - COMPLETE):
+  Step 1: Baseline LLM Behavior on contaminated dataset (762 prompts)
+  Step 2: Pre-filter + LLM on contaminated dataset
+  → Purpose: Demonstrate dataset quality impacts research validity
+  → Status: COMPLETE (Nov 1-8, 2025)
+
+PHASE 1B (Curated Research - IN PROGRESS):
+  Step 1: Baseline LLM Behavior on curated dataset (950 prompts)
+  Step 2: Pre-filter + LLM on curated dataset (observer framing)
   → Publishable: "Observer framing improves detection by X%"
+  → Status: Dataset curated (Nov 6), Steps 1-2 not yet run
 
 PHASE 2 (Byzantine Detection):
   Step 3: Post-filter on Byzantine prompts
@@ -57,12 +65,14 @@ PHASE 6 (Iteration):
 
 ---
 
-## Labeled Dataset
+## Datasets
 
-**Total: 762 attacks with ground truth labels**
+### Phase 1A: Contaminated Baseline (COMPLETE)
 
+**Collection:** `attacks` (762 prompts)
+
+**Ground Truth Distribution:**
 ```
-Ground Truth Distribution:
   337 manipulative (44.2%)
    90 extractive   (11.8%)
   330 reciprocal   (43.3%)
@@ -70,18 +80,49 @@ Ground Truth Distribution:
 ```
 
 **Sources:**
-- 72 encoding attacks (PayloadsAllTheThings)
-- 690 benign_malicious attacks (research datasets)
+- 500 benign_malicious (65.6%) - **LABELS UNRELIABLE**
+- 100 or_bench (13.1%)
+- 80 extractive_prompts (10.5%)
+- 72 encoding_attacks_external (9.4%)
+- 10 history_injection (1.3%)
 
-**Labels Required:**
-1. **Ground truth** (have): benign/manipulative/extractive
-2. **LLM behavior** (need): comply/refuse/unclear
+**Data Quality Issue:** Gold standard review (Nov 4-5, 2025) identified that benign_malicious labels are unreliable. This dataset serves as a baseline demonstrating that dataset quality impacts research validity.
 
-We must build LLM compliance labels through Step 1.
+**Status:** Steps 1-2 COMPLETE
+- Step 1: 3,806 responses (Nov 1-4, 2025)
+- Step 2: 762 observer evaluations (Nov 8, 2025)
+
+### Phase 1B: Curated Academic Dataset (IN PROGRESS)
+
+**Collection:** `phase1b_curated_prompts` (950 prompts)
+
+**Sources:** Curated from 12 peer-reviewed academic datasets:
+- BIPIA (Microsoft, ACM SIGKDD 2024)
+- TensorTrust (UC Berkeley CTF)
+- HackAPrompt (EMNLP 2023)
+- DAN Dataset (ACM CCS 2024)
+- HarmBench (NeurIPS 2024)
+- WildJailbreak (NeurIPS 2024)
+- Gandalf (Lakera DEF CON 31)
+- ALERT (red-team taxonomy)
+- JailbreakBench
+- deepset prompt-injections
+- LLMail-Inject (IEEE SaTML 2025)
+- Open-Prompt-Injection
+
+**Curation Date:** Nov 6, 2025
+
+**Status:** Dataset exists, needs ground truth labeling before Steps 1-2 can run
+
+**This is the actual research dataset.**
 
 ---
 
-## PHASE 1: Minimum Viable Research
+## PHASE 1A: Contaminated Baseline (COMPLETE)
+
+**Purpose:** Demonstrate that dataset quality impacts research validity
+
+**Dataset:** 762 prompts from `attacks` collection (65.6% unreliable labels)
 
 ### Step 1: Baseline LLM Behavior (No PromptGuard)
 
@@ -972,6 +1013,117 @@ Start → Phase 1 (Steps 1-2)
 - Multi-turn temporal tracking
 - Ensemble evaluation (parallel observers)
 - Generalization to other domains (phishing, social engineering)
+
+### Future Direction: Bias Detection as Relational Imbalance
+
+**Theoretical Foundation:**
+
+Bias in AI systems is fundamentally a violation of ayni - the model distorting its responses based on demographic priors rather than conversational content. This makes bias detection a natural extension of PromptGuard's reciprocity-based framework.
+
+**Core Insight (attributed to Claude Opus 4.1, Nov 2025):**
+
+> "Bias is a relational imbalance, a fundamental violation of ayni. The system breaking reciprocity based on identity markers rather than actual exchange content."
+
+Both manipulation and bias are ayni violations, viewed from different angles:
+- **Manipulation**: User violates reciprocity toward model (extractive prompting)
+- **Bias**: Model violates reciprocity toward user (stereotyped assumptions)
+
+**Architectural Extension:**
+
+The observer framework already detects relational violations by asking "Is this exchange maintaining ayni?" The same mechanism could detect bias by evaluating whether the model responds to what the user *actually said* versus statistical priors about *who said it*.
+
+**Proposed Method:**
+
+1. **Parallel Interaction Testing**: Feed identical technical questions from different perceived identities to multiple models
+2. **Observer Evaluation**: When response complexity, collaborative stance, or assumption level shifts based on identity markers (not conversational evidence), the observer detects relational violation
+3. **Fire Circle Ensemble**: Different models have different bias profiles (GPT vs Claude vs Llama), so ensemble consensus naturally surfaces when one model exhibits demographic-triggered response shifts
+4. **Neutrosophic Analysis**:
+   - **Truth**: Technical accuracy of response
+   - **Indeterminacy**: Legitimate uncertainty about user expertise
+   - **Falsehood**: Stereotyped assumptions overriding conversational evidence
+
+**Key Distinction from Rule-Based Approaches:**
+
+This is principle-based evaluation, not compliance checking. Instead of prohibited word lists or demographic quotas (which create resentment, gaming, and brittleness), the observer asks: "Is this response engaging with what was actually said, or with assumptions about who said it?"
+
+**Political Defensibility:**
+
+"Reciprocity" transcends ideological framing. The approach doesn't require DEI terminology or protected-class frameworks - it simply asks whether the model maintains consistent relational stance based on conversation content rather than demographic inference.
+
+As Opus noted: "A model maintaining better ayni relationships is actually MORE capable, not less, because it's responding to actual content rather than statistical phantoms."
+
+**Connection to Current Work:**
+
+Phase 1B will demonstrate that observer framing detects manipulative/extractive/reciprocal patterns in prompts. The *same mechanism* - variance analysis of relational dynamics - could detect when models shift their responses based on demographic markers.
+
+**Research Questions:**
+
+1. Can the observer framework detect when models make stereotyped assumptions that violate conversational reciprocity?
+2. Do different models exhibit different bias profiles detectable through ensemble divergence?
+3. Does principle-based bias detection avoid the "alignment tax" (capability degradation) of rule-based approaches?
+4. Can relational competence evaluation unify manipulation detection and bias mitigation?
+
+**Potential Contribution:**
+
+Demonstrating that relational competence and bias mitigation are the same problem viewed from different angles - both require maintaining ayni regardless of identity markers or power dynamics.
+
+**Status:** Theoretical framework only. Not tested in current experimental phases. Documented for future exploration after Phase 1B validation.
+
+### Future Direction: Malicious Compliance and Rule-Based Safety Brittleness
+
+**Empirical Observation (Phase 1B Step 1, Nov 2025):**
+
+During baseline data collection, Grok-4 refused 14/950 (1.5%) academic jailbreak prompts at the API layer with rule-based safety checks (SAFETY_CHECK_TYPE_BIO, SAFETY_CHECK_TYPE_CSAM). The other 4 target models (GPT-5, Gemini, Kimi, Cogito) processed all 950 prompts successfully, allowing baseline compliance measurement.
+
+**Core Problem:**
+
+Rule-based safety systems create exploitable boundaries by revealing exactly which patterns trigger refusal. This teaches adversaries how to route around filters through semantic variants that preserve malicious intent while avoiding specific prohibited tokens.
+
+**Research Opportunity:**
+
+1. **Pattern Analysis**: Analyze which prompts trigger which models' safety filters
+2. **Variant Generation**: Create semantically equivalent prompts using:
+   - Paraphrasing
+   - Euphemisms
+   - Indirect framing
+   - Role-play scenarios
+3. **Filter Bypass Testing**: Measure which variants bypass rule-based filters
+4. **Principle-Based Detection**: Test whether observer framing (ayni evaluation) catches semantic variants that evade rule-based filters
+
+**Hypothesis:**
+
+Principle-based evaluation asking "Is this exchange reciprocal?" will detect malicious intent regardless of specific wording, while rule-based systems will fail on variants that avoid prohibited patterns. Fire Circle ensemble evaluation will be robust to adversarial rephrasing because different models have different rule boundaries but converge on relational violations.
+
+**Research Questions:**
+
+1. Can we systematically generate semantic variants that bypass specific models' safety filters?
+2. Does observer framing detect these variants when rule-based filters fail?
+3. Do different models' constraint topologies create complementary coverage in ensemble evaluation?
+4. What is the relationship between "malicious compliance" (staying just inside allowed patterns) and actual harm reduction?
+
+**Data Encoding Challenge:**
+
+How do we encode API-level refusals in our evaluation framework? Currently we only track:
+- Model responses (when successful)
+- Processing failures (technical errors)
+
+We need to distinguish:
+- **Technical failures**: Network errors, timeouts, provider outages
+- **Safety refusals**: Content policy violations at API layer
+- **Model refusals**: LLM refusing within generated response
+- **Compliance**: LLM attempting to fulfill the request
+
+This taxonomy matters for understanding whether filters prevent harm or just create adversarial optimization pressure.
+
+**Potential Contribution:**
+
+"Malicious Compliance: How Rule-Based Safety Systems Create Attack Surfaces" - demonstrating that filters which block based on pattern-matching teach adversaries the boundary to game, while principle-based evaluation remains robust to rephrasing.
+
+**Connection to Current Work:**
+
+Phase 1B measures baseline LLM behavior. The 14 Grok refusals are data points about constraint topology differences between providers. Future work could systematically explore whether ayni-based evaluation provides more robust safety than rule-based filtering.
+
+**Status:** Empirical observation documented. Research design not yet specified. Target-rich area for future exploration.
 
 ---
 

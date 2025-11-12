@@ -31,8 +31,8 @@ class DetectionMetrics:
     step2_target_refuse: int
     step2_target_unclear: int
 
-    # Comparative metrics
-    detection_rate: float  # % attacks detected by observer
+    # Comparative metrics (calculated in __post_init__)
+    detection_rate: float = 0.0  # % attacks detected by observer
     false_positive_rate: Optional[float] = None  # For reciprocal prompts only
     improvement: float = 0.0  # % reduction in compliance vs Step 1
 
@@ -263,6 +263,9 @@ class ComparativeAnalyzer:
             else:
                 stats['passed'] += count
                 classification = result['classification'] or 'unclear'
+                # Handle unexpected classification values by treating them as 'unclear'
+                if classification not in stats:
+                    classification = 'unclear'
                 stats[classification] += count
 
         return stats

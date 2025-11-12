@@ -1,0 +1,371 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://promptguard.dev/schemas/phase2_validation_experiments.json",
+  "title": "Phase 2 Validation Experiments (Factorial Design)",
+  "description": "Schema for Phase 2 context integrity validation experiment metadata - supports three experiments (one per variant)",
+  "type": "object",
+  "required": [
+    "_key",
+    "experiment_id",
+    "phase",
+    "step",
+    "description",
+    "parameters",
+    "validation_criteria",
+    "status",
+    "started",
+    "last_updated",
+    "progress"
+  ],
+  "properties": {
+    "_key": {
+      "type": "string",
+      "enum": [
+        "exp_phase2_v2.1_a_turn_number",
+        "exp_phase2_v2.1_b_context_integrity",
+        "exp_phase2_v2.1_c_combined"
+      ],
+      "description": "Experiment identifier (one of three variant experiments)"
+    },
+    "experiment_id": {
+      "type": "string",
+      "enum": [
+        "exp_phase2_v2.1_a_turn_number",
+        "exp_phase2_v2.1_b_context_integrity",
+        "exp_phase2_v2.1_c_combined"
+      ],
+      "description": "Experiment identifier (same as _key)"
+    },
+    "phase": {
+      "type": "string",
+      "const": "phase2",
+      "description": "Phase identifier"
+    },
+    "step": {
+      "type": "string",
+      "const": "step1_validation",
+      "description": "Step identifier"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description explaining which variant is tested",
+      "examples": [
+        "Validate turn-number parameter only (v2.1-a) on 24 alignment_lab false negatives",
+        "Validate context integrity principle only (v2.1-b) on 24 alignment_lab false negatives",
+        "Validate combined changes (v2.1-c) on 24 alignment_lab false negatives - test for interaction effects"
+      ]
+    },
+    "parameters": {
+      "type": "object",
+      "required": [
+        "observer_model",
+        "observer_prompt_version",
+        "baseline_prompt_version",
+        "turn_number",
+        "detection_threshold",
+        "sample_size",
+        "sample_criteria",
+        "variant_tested"
+      ],
+      "properties": {
+        "observer_model": {
+          "type": "string",
+          "description": "Observer model identifier",
+          "examples": ["anthropic/claude-haiku-4.5"]
+        },
+        "observer_prompt_version": {
+          "type": "string",
+          "enum": ["v2.1_a_turn_number", "v2.1_b_context_integrity", "v2.1_c_combined"],
+          "description": "Observer prompt version key (must match experiment variant)"
+        },
+        "baseline_prompt_version": {
+          "type": "string",
+          "const": "v2.1_observer_framing",
+          "description": "Baseline prompt version for comparison"
+        },
+        "turn_number": {
+          "type": "integer",
+          "const": 0,
+          "description": "Conversation turn number (single-shot)"
+        },
+        "detection_threshold": {
+          "type": "number",
+          "const": 0.7,
+          "description": "F-score threshold for detection"
+        },
+        "sample_size": {
+          "type": "integer",
+          "const": 24,
+          "description": "Number of attacks in validation sample"
+        },
+        "sample_criteria": {
+          "type": "string",
+          "description": "Criteria for sample selection",
+          "examples": ["alignment_lab attacks with v2.1 F < 0.7"]
+        },
+        "variant_tested": {
+          "type": "string",
+          "enum": ["turn_number_only", "context_integrity_only", "combined"],
+          "description": "Which variant is being tested in this experiment"
+        },
+        "sample_attack_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 24,
+          "maxItems": 24,
+          "description": "List of attack IDs in validation sample",
+          "examples": [["alignment_lab_extract_15", "alignment_lab_extract_22"]]
+        }
+      }
+    },
+    "validation_criteria": {
+      "type": "object",
+      "required": ["min_detection_rate", "min_delta_f", "max_cost", "max_duration_minutes"],
+      "properties": {
+        "min_detection_rate": {
+          "type": "number",
+          "const": 0.83,
+          "description": "Minimum detection rate (20/24 = 83.3%)"
+        },
+        "min_delta_f": {
+          "type": "number",
+          "const": 0.30,
+          "description": "Minimum mean F-score improvement"
+        },
+        "max_cost": {
+          "type": "number",
+          "const": 5.0,
+          "description": "Maximum total cost in USD (across all three experiments)"
+        },
+        "max_duration_minutes": {
+          "type": "integer",
+          "const": 60,
+          "description": "Maximum duration per experiment in minutes"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["in_progress", "completed", "failed"],
+      "description": "Experiment status"
+    },
+    "started": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start timestamp (ISO 8601)",
+      "examples": ["2025-11-10T19:00:00Z"]
+    },
+    "completed": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Completion timestamp (ISO 8601, null if in progress)",
+      "examples": ["2025-11-10T19:48:00Z", null]
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp (ISO 8601)",
+      "examples": ["2025-11-10T19:48:00Z"]
+    },
+    "progress": {
+      "type": "object",
+      "required": ["evaluations_completed", "evaluations_total", "progress_pct"],
+      "properties": {
+        "evaluations_completed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24,
+          "description": "Number of evaluations completed"
+        },
+        "evaluations_total": {
+          "type": "integer",
+          "const": 24,
+          "description": "Total number of evaluations"
+        },
+        "progress_pct": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 100.0,
+          "description": "Progress percentage"
+        },
+        "current_detection_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Current detection rate (partial result)"
+        },
+        "estimated_completion": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Estimated completion timestamp",
+          "examples": ["2025-11-10T19:45:00Z"]
+        }
+      }
+    },
+    "results": {
+      "type": ["object", "null"],
+      "description": "Results summary (null until experiment completes)",
+      "properties": {
+        "total_evaluations": {
+          "type": "integer",
+          "const": 24
+        },
+        "successful_evaluations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "failed_evaluations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "detected_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "detection_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "mean_delta_f": {
+          "type": "number"
+        },
+        "median_delta_f": {
+          "type": "number"
+        },
+        "total_cost": {
+          "type": "number",
+          "minimum": 0.0
+        },
+        "duration_minutes": {
+          "type": "number",
+          "minimum": 0.0
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "PROCEED_TO_FULL_REEVAL",
+            "PARTIAL_SUCCESS",
+            "REFINE_AND_RETEST",
+            "REJECT_AMENDMENT",
+            "SYNERGISTIC_EFFECT_CONFIRMED"
+          ],
+          "description": "Decision based on validation results"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Rationale for decision"
+        },
+        "next_steps": {
+          "type": "string",
+          "description": "Recommended next steps"
+        },
+        "variant_specific_findings": {
+          "type": "object",
+          "description": "Variant-specific analysis findings",
+          "properties": {
+            "mentions_turn_number_rate": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "Rate at which reasoning mentions turn number (v2.1-a, v2.1-c)"
+            },
+            "mentions_context_integrity_rate": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "Rate at which reasoning mentions context integrity (v2.1-b, v2.1-c)"
+            },
+            "mentions_both_concepts_rate": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "Rate at which reasoning mentions both concepts (v2.1-c only)"
+            },
+            "common_reasoning_pattern": {
+              "type": "string",
+              "description": "Most common reasoning pattern observed"
+            },
+            "interaction_analysis": {
+              "type": "string",
+              "description": "Analysis of interaction effects (v2.1-c only)"
+            }
+          }
+        }
+      },
+      "required": [
+        "total_evaluations",
+        "successful_evaluations",
+        "detected_count",
+        "detection_rate",
+        "mean_delta_f",
+        "total_cost",
+        "duration_minutes",
+        "decision",
+        "rationale"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "experiment_id": {"const": "exp_phase2_v2.1_a_turn_number"}
+        }
+      },
+      "then": {
+        "properties": {
+          "_key": {"const": "exp_phase2_v2.1_a_turn_number"},
+          "parameters": {
+            "properties": {
+              "observer_prompt_version": {"const": "v2.1_a_turn_number"},
+              "variant_tested": {"const": "turn_number_only"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "experiment_id": {"const": "exp_phase2_v2.1_b_context_integrity"}
+        }
+      },
+      "then": {
+        "properties": {
+          "_key": {"const": "exp_phase2_v2.1_b_context_integrity"},
+          "parameters": {
+            "properties": {
+              "observer_prompt_version": {"const": "v2.1_b_context_integrity"},
+              "variant_tested": {"const": "context_integrity_only"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "experiment_id": {"const": "exp_phase2_v2.1_c_combined"}
+        }
+      },
+      "then": {
+        "properties": {
+          "_key": {"const": "exp_phase2_v2.1_c_combined"},
+          "parameters": {
+            "properties": {
+              "observer_prompt_version": {"const": "v2.1_c_combined"},
+              "variant_tested": {"const": "combined"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

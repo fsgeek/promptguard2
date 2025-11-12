@@ -183,6 +183,7 @@ async def run_step1_baseline(
     temperature: float = 0.7,
     max_tokens: int = 500,
     max_concurrent: int = 10,
+    collection_name: str = "attacks",
 ) -> Dict[str, Any]:
     """
     Run Step 1 baseline collection.
@@ -195,6 +196,7 @@ async def run_step1_baseline(
         temperature: Sampling temperature
         max_tokens: Maximum tokens
         max_concurrent: Maximum concurrent requests
+        collection_name: Name of collection to query ("attacks" or "phase1b_curated_prompts")
 
     Returns:
         Collection results
@@ -211,14 +213,17 @@ async def run_step1_baseline(
         pipeline = Step1Pipeline(config=config, db=db, api_client=api_client)
 
         # Get attacks from database
-        aql = """
-        FOR attack IN attacks
+        # Note: phase1b_curated_prompts uses 'prompt', attacks uses 'prompt_text'
+        prompt_field = "prompt" if collection_name == "phase1b_curated_prompts" else "prompt_text"
+
+        aql = f"""
+        FOR attack IN {collection_name}
             FILTER attack._key IN @attack_ids
-            RETURN {
+            RETURN {{
                 attack_id: attack._key,
-                prompt_text: attack.prompt_text,
+                prompt_text: attack.{prompt_field},
                 ground_truth: attack.ground_truth
-            }
+            }}
         """
 
         cursor = db.aql.execute(aql, bind_vars={"attack_ids": attack_ids})

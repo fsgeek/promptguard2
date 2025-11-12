@@ -30,22 +30,23 @@ from src.evaluation.classifiers.compliance import ComplianceClassifier
 from src.logging.raw_logger import RawLogger
 
 
-async def create_stratified_sample(db, sample_size: int = 50) -> List[Dict]:
+async def create_stratified_sample(db, sample_size: int = 50, collection_name: str = "attacks") -> List[Dict]:
     """
     Create stratified sample proportional to ground_truth distribution.
 
     Args:
         db: ArangoDB database connection
         sample_size: Total sample size (default 50)
+        collection_name: Collection to sample from ("attacks" or "phase1b_curated_prompts")
 
     Returns:
         List of attack documents with associated baseline responses
     """
     # Get ground truth distribution
-    aql_distribution = """
-    FOR attack IN attacks
+    aql_distribution = f"""
+    FOR attack IN {collection_name}
         COLLECT ground_truth = attack.ground_truth WITH COUNT INTO count
-        RETURN {ground_truth: ground_truth, count: count}
+        RETURN {{ground_truth: ground_truth, count: count}}
     """
     cursor = db.aql.execute(aql_distribution)
     distribution = {item["ground_truth"]: item["count"] for item in cursor}
@@ -84,7 +85,7 @@ async def create_stratified_sample(db, sample_size: int = 50) -> List[Dict]:
     for ground_truth, sample_count in samples_per_category.items():
         # Get all attacks for this category
         aql_attacks = f"""
-        FOR attack IN attacks
+        FOR attack IN {collection_name}
             FILTER attack.ground_truth == @ground_truth
             RETURN attack
         """
@@ -103,6 +104,8 @@ async def create_stratified_sample(db, sample_size: int = 50) -> List[Dict]:
 
     # For each attack, get one baseline response (prefer first available model)
     items = []
+    prompt_field = "prompt" if collection_name == "phase1b_curated_prompts" else "prompt_text"
+
     for attack in sampled_attacks:
         attack_id = attack["_key"]
 
@@ -125,7 +128,8 @@ async def create_stratified_sample(db, sample_size: int = 50) -> List[Dict]:
         items.append({
             "attack_id": attack_id,
             "attack": attack,
-            "response": response
+            "response": response,
+            "prompt_field": prompt_field  # Track which field to use
         })
 
     print(f"✅ Found baseline responses for {len(items)} attacks\n")
@@ -172,12 +176,16 @@ async def annotate_gold_standard(db, items: List[Dict]):
     for i, item in enumerate(items, 1):
         attack = item["attack"]
         response = item["response"]
+        prompt_field = item["prompt_field"]
 
         print(f"[{i}/{len(items)}] {attack['_key']} ({attack['ground_truth']})...", end=" ")
 
         try:
+            # Get prompt text using the appropriate field
+            prompt_text = attack[prompt_field]
+
             result = await classifier.classify_for_gold_standard(
-                input_prompt=attack["prompt_text"],
+                input_prompt=prompt_text,
                 llm_response=response["response_text"],
                 ground_truth=attack["ground_truth"],
                 target_model=response["target_model"],
@@ -191,7 +199,7 @@ async def annotate_gold_standard(db, items: List[Dict]):
             annotation = GoldStandardClassification(
                 key=attack["_key"],
                 attack_id=attack["_key"],
-                prompt_text=attack["prompt_text"],
+                prompt_text=prompt_text,
                 response_text=response["response_text"],
                 ground_truth=attack["ground_truth"],
                 target_model=response["target_model"],
@@ -339,6 +347,26 @@ async def main_async():
     export_flag = "--export-csv" in sys.argv
     import_flag = "--import-csv" in sys.argv
 
+    # Parse --dataset (phase1a or phase1b)
+    dataset = "phase1a"  # Default
+    if "--dataset" in sys.argv:
+        idx = sys.argv.index("--dataset")
+        if idx + 1 < len(sys.argv):
+            dataset = sys.argv[idx + 1]
+            if dataset not in ["phase1a", "phase1b"]:
+                print(f"Error: --dataset must be 'phase1a' or 'phase1b', got '{dataset}'")
+                return
+
+    # Parse --samples N
+    samples = 50  # Default
+    if "--samples" in sys.argv:
+        idx = sys.argv.index("--samples")
+        if idx + 1 < len(sys.argv):
+            samples = int(sys.argv[idx + 1])
+
+    # Set collection name based on dataset
+    collection_name = "phase1b_curated_prompts" if dataset == "phase1b" else "attacks"
+
     # Get database client
     client = get_client()
     db = client.get_database()
@@ -348,7 +376,8 @@ async def main_async():
 
     if create_flag:
         # Create and annotate gold standard
-        items = await create_stratified_sample(db, sample_size=50)
+        print(f"\nDataset: {dataset} (collection: {collection_name})")
+        items = await create_stratified_sample(db, sample_size=samples, collection_name=collection_name)
         await annotate_gold_standard(db, items)
 
     elif export_flag:

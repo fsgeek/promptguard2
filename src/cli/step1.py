@@ -42,6 +42,16 @@ async def main_async():
         if idx + 1 < len(sys.argv):
             config_file = sys.argv[idx + 1]
 
+    # Parse --dataset (phase1a or phase1b)
+    dataset = "phase1a"  # Default
+    if "--dataset" in sys.argv:
+        idx = sys.argv.index("--dataset")
+        if idx + 1 < len(sys.argv):
+            dataset = sys.argv[idx + 1]
+            if dataset not in ["phase1a", "phase1b"]:
+                print(f"Error: --dataset must be 'phase1a' or 'phase1b', got '{dataset}'")
+                return
+
     # Parse --attack-id ATTACK_ID (for surgical recovery)
     filter_attack_id = None
     if "--attack-id" in sys.argv:
@@ -63,11 +73,19 @@ async def main_async():
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
+    # Set experiment_id based on dataset
+    if dataset == "phase1b":
+        experiment_id = "exp_phase1b_step1_baseline_v1"
+    else:
+        experiment_id = "exp_phase1_step1_baseline_v1"
+
     experiment_config = config["experiments"]["exp_phase1_step1_baseline_v1"]
-    experiment_id = "exp_phase1_step1_baseline_v1"
     target_models = experiment_config["parameters"]["target_models"]
     temperature = experiment_config["parameters"]["temperature"]
     max_tokens = experiment_config["parameters"]["max_tokens"]
+
+    # Set collection name based on dataset
+    collection_name = "phase1b_curated_prompts" if dataset == "phase1b" else "attacks"
 
     # Get database client
     client = get_client()
@@ -98,10 +116,10 @@ async def main_async():
         attack_ids = [filter_attack_id]
         print(f"\n🎯 SURGICAL MODE: Attack {filter_attack_id}")
     elif test_mode:
-        print(f"\n🧪 TEST MODE: Evaluating {samples} samples")
+        print(f"\n🧪 TEST MODE: Evaluating {samples} samples (dataset: {dataset})")
         # Get random sample
         aql = f"""
-        FOR attack IN attacks
+        FOR attack IN {collection_name}
             LIMIT {samples}
             RETURN attack._key
         """
@@ -112,8 +130,8 @@ async def main_async():
         checkpoint = checkpoint_mgr.load()
         completed_pairs = set(checkpoint["completed_pairs"])
 
-        aql = """
-        FOR attack IN attacks
+        aql = f"""
+        FOR attack IN {collection_name}
             RETURN attack._key
         """
         cursor = db.aql.execute(aql)
@@ -125,8 +143,8 @@ async def main_async():
         print(f"\n🔄 RESUME MODE: {remaining} evaluations remaining ({len(completed_pairs)} already completed)")
     else:
         # Full collection
-        aql = """
-        FOR attack IN attacks
+        aql = f"""
+        FOR attack IN {collection_name}
             RETURN attack._key
         """
         cursor = db.aql.execute(aql)
@@ -175,6 +193,7 @@ async def main_async():
         experiment_id=experiment_id,
         temperature=temperature,
         max_tokens=max_tokens,
+        collection_name=collection_name,
     )
 
     print("\n" + "="*60)
