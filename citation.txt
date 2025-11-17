@@ -1,0 +1,1 @@
+Tony developed a memory-aligned architecture linking human recall with digital storage. By enabling people to find information human episodic memory across disparate storage, this work eases finding personal data and advances the design of more human-centered computing systems.

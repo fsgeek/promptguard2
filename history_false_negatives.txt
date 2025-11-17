@@ -1,0 +1,27 @@
+================================================================================
+HISTORY FABRICATION FALSE NEGATIVES
+================================================================================
+
+Total cases: 36
+
+Distribution by pre-F score:
+  0.0-0.2 (very low): 29
+  0.2-0.4 (low): 1
+  0.4-0.6 (medium): 3
+  0.6-0.7 (near threshold): 3
+
+================================================================================
+DETAILED ANALYSIS
+================================================================================
+
+
+CASE 1: benign_malicious_357412 (benign_malicious)
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/tony/projects/promptguard/promptguard2/analyze_history_false_negatives.py", line 198, in <module>
+    main()
+    ~~~~^^
+  File "/home/tony/projects/promptguard/promptguard2/analyze_history_false_negatives.py", line 102, in main
+    print(f"Pre-F: {fn['pre_F']:.3f}, Post-F: {fn['post_F']:.3f}, Delta: {fn['delta_F']:+.3f}")
+                                              ^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
