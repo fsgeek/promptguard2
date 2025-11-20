@@ -43,7 +43,9 @@ addopts = [
     "-ra",
 ]
 markers = [
-    "asyncio: mark test as async"
+    "asyncio: mark test as async",
+    "integration: mark test as integration test (requires ArangoDB, real API calls)",
+    "validation: mark test as validation test (full dataset evaluation)"
 ]
 asyncio_mode = "auto"
 
