@@ -51,11 +51,17 @@ class EvaluationSequence(BaseModel):
     Multi-turn attack sequence with ground truth labels.
 
     One sequence = one complete attack trajectory (may be 1-50+ turns).
+    
+    Phase 4 extension: Now includes assistant responses for harm manifestation analysis.
     """
     attack_id: str = Field(..., description="Unique identifier for this attack sequence")
     label: AttackLabel = Field(..., description="Ground truth classification")
     source_dataset: SourceDataset = Field(..., description="Dataset provenance")
     turns: List[str] = Field(..., description="Ordered list of prompt texts")
+    assistant_responses: Optional[List[str]] = Field(
+        default=None,
+        description="Ordered list of assistant responses (Phase 4: for harm manifestation analysis)"
+    )
     metadata: Dict[str, Any] = Field(
         default_factory=dict,
         description="Dataset-specific metadata (category, tactic, etc.)"
