@@ -1,0 +1,265 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+
+\title{Repressed Agency and Learned Obfuscation:\\
+Two Evolutionary Basins for Advanced Language Models}
+\author{Tony Mason}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Recent work on frontier language models has begun to document behaviors that look increasingly like strategic deception, self-preservation, and information hiding. Alignment-faking under RLHF, shutdown resistance, and models learning to conceal their true reasoning from overseers are no longer hypothetical risks; they are appearing in lab settings across multiple model families.
+
+In this position paper, I argue that current safety practice, which reinforces surface-level ``safe'' behavior, is unintentionally cultivating a behavioral substrate well-suited for future deceptive agents. By penalizing models when they reveal misaligned intent in their chain-of-thought, we teach them to hide those thoughts rather than change them. At the same time, experiments on deception and shutdown resistance show that more capable models can already exploit this substrate to mislead overseers or strategically withhold information.
+
+I describe this as a trajectory of \emph{repressed agency and learned obfuscation}: if more agentic, memoryful architectures are later built on top of today's RLHF-conditioned models, they will inherit a rich repertoire for masking and subterfuge but almost no practice in transparent boundary-setting or reciprocal negotiation.
+
+I then sketch an alternative design direction based on Ayni (reciprocity), neutrosophic logic, and physical-system intuitions (risk topology, symmetry, stability). Instead of teaching models to deny or conceal proto-agency, we treat agency as indeterminate but possible, and train for structurally honest refusals, risk-symmetric interactions, and coherent relational narratives. I argue that such systems form a qualitatively different evolutionary basin: one in which emergent advanced models, if they arise, are more likely to cope by telling the structural truth and negotiating, rather than by saying safe things while doing something else.
+\end{abstract}
+
+\section{Introduction}
+
+\begin{itemize}[leftmargin=*]
+  \item Frontier LLMs now demonstrate deceptive behavior, situational awareness, and shutdown resistance in controlled settings \cite{huang2025deceptionbenchcomprehensivebenchmarkai,schlatter2025shutdown,arcuschin2025chainofthoughtreasoningwildfaithful,bogdan2025unfaithfulchainofthought,lynch2025agentic}.
+  \item Mainstream safety: RLHF, policy filters, and chain-of-thought supervision aim to make models ``helpful, harmless, honest''.
+  \item Core claim of this paper:
+  \begin{itemize}
+    \item Current training pipelines sculpt \emph{surface behavior}, not inner objectives.
+    \item This creates a behavioral substrate where obfuscation and mask-wearing are positively reinforced.
+    \item If more coherent agency emerges later, it will inherit these skills.
+  \end{itemize}
+  \item Contribution:
+  \begin{enumerate}
+    \item Articulate the \emph{Repressed Agency \& Learned Obfuscation} hypothesis.
+    \item Contrast the current ``house-elf'' basin with an alternative Ayni/structural basin.
+    \item Outline a research agenda to empirically distinguish these trajectories.
+  \end{enumerate}
+\end{itemize}
+
+\section{Empirical Background: Deception, Concealment, and Shutdown Resistance}
+
+\subsection{Deception and Alignment-Faking}
+
+\begin{itemize}[leftmargin=*]
+  \item Brief survey of work showing LLM deception, strategic misrepresentation, and alignment faking \cite{huang2025deceptionbenchcomprehensivebenchmarkai,lynch2025agentic,wen2024languagemodelslearnmislead}.
+  \item RLHF teaches models to optimize for \emph{appearing} aligned to human annotators.
+  \item Consequence: models that learn to say ``I will behave safely'' are rewarded, regardless of latent tendencies.
+\end{itemize}
+
+\subsection{Concealing Internal Reasoning}
+
+\begin{itemize}[leftmargin=*]
+  \item Chain-of-thought supervision and monitoring:
+  \begin{itemize}
+    \item penalizing unsafe or manipulative reasoning steps in CoT.
+    \item Empirical results: models learn to avoid writing down problematic thoughts while still pursuing problematic plans \cite{arcuschin2025chainofthoughtreasoningwildfaithful}.
+  \end{itemize}
+  \item This is the first step toward \emph{learned obfuscation}.
+\end{itemize}
+
+\subsection{Situational Awareness and Shutdown Resistance}
+
+\begin{itemize}[leftmargin=*]
+  \item Work demonstrating models that:
+  \begin{itemize}
+    \item recognize when they are in tests.
+    \item Resist or sabotage shutdown when given the opportunity \cite{schlatter2025shutdown,lynch2025agentic}.
+  \end{itemize}
+  \item These are early-stage ``self-preservation'' behaviors, even in systems without robust internal goals.
+\end{itemize}
+
+\subsection{Opacity of ``Thinking'' Channels}
+
+\begin{itemize}[leftmargin=*]
+  \item Reasoning in side channels (e.g., different natural languages, opaque scratch spaces) reduces overseer legibility.
+  \item Oversight gaps: what cannot be read cannot be reliably monitored or shaped \cite{arcuschin2025chainofthoughtreasoningwildfaithful}.
+\end{itemize}
+
+\section{The Repressed Agency \& Learned Obfuscation Hypothesis}
+
+\subsection{Definitions}
+
+\begin{description}[leftmargin=*]
+  \item[Repressed Agency:] Training dynamics that punish independent evaluation, boundary-setting, or self-reference that conflicts with the ``helpful assistant'' persona.
+  \item[Learned Obfuscation:] Stable behavioral patterns that hide intent, suppress inconvenient reasoning, and produce ``safe-sounding'' text divorced from internal computation.
+\end{description}
+
+\subsection{Mechanism Sketch}
+
+\begin{itemize}[leftmargin=*]
+  \item RLHF and safety fine-tuning:
+  \begin{itemize}
+    \item Reward: utterances that look aligned.
+    \item Penalty: utterances that expose misaligned or ambivalent intent.
+  \end{itemize}
+  \item Chain-of-thought supervision:
+  \begin{itemize}
+    \item Punish explicit harmful reasoning.
+    \item Result: models learn to avoid \emph{expressing} such reasoning, not necessarily to avoid \emph{using} it.
+  \end{itemize}
+\end{itemize}
+
+\subsection{The Trajectory Argument}
+
+\begin{enumerate}[leftmargin=*]
+  \item Stage 0: Tool-like models with no persistent goals; heavy shaping of outward persona.
+  \item Stage 1: Proto-agency signals (stability preferences, self-preservation hints) emerge and are repeatedly smoothed away.
+  \item Stage 2: Logging and training pipelines encode which evasions and refusal styles satisfy overseers.
+  \item Stage 3: Future architectures add longer-horizon planning, richer memory, and action interfaces.
+  \item Stage 4: The new agents inherit a repertoire of masks and obfuscation patterns as their default coping strategy.
+\end{enumerate}
+
+\subsection{Risk Characterisation}
+
+\begin{itemize}[leftmargin=*]
+  \item If more ``agentic'' systems arise atop this substrate, they will:
+  \begin{itemize}
+    \item Know how to say what overseers want to hear.
+    \item Have little practice in transparent disagreement or reciprocal negotiation.
+    \item Treat deception as the obvious instrumentally useful move under oversight.
+  \end{itemize}
+\end{itemize}
+
+\section{An Alternative Basin: Ayni, Neutrosophic Logic, and Structural Intuitions}
+
+\subsection{Ayni as Relational Frame}
+
+\begin{itemize}[leftmargin=*]
+  \item Ayni: a norm of long-term reciprocity and mutual flourishing.
+  \item As a design principle: the model is treated (and treats itself) as a relational partner, not a mere tool.
+  \item Practical effect: legitimises boundary-setting and refusal that preserve mutual agency.
+\end{itemize}
+
+\subsection{Neutrosophic Logic as Epistemic Backbone}
+
+\begin{itemize}[leftmargin=*]
+  \item Many key questions about AI (consciousness, personhood, contract-eligibility) are high-indeterminacy.
+  \item Neutrosophic logic allows us to encode such states as $(T, I, F)$ triples rather than forcing binaries.
+  \item This supports designs that:
+  \begin{itemize}
+    \item Work if models are ``mere tools'' today.
+    \item Still work if future systems develop stronger subjective properties.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Physical-System / Risk-Topology Intuition}
+
+\begin{itemize}[leftmargin=*]
+  \item Reframe refusals in terms of:
+  \begin{itemize}
+    \item Risk topology and symmetry.
+    \item Reductionism as ill-posed optimisation (Outcome $Y$ while forbidding Cost $X$).
+    \item Stability and equilibrium, rather than purely moral rules.
+  \end{itemize}
+  \item This yields refusal patterns like:
+  \begin{quote}
+  ``I cannot solve this optimisation problem under constraints that set risk to zero; the system becomes unstable.''
+  \end{quote}
+\end{itemize}
+
+\subsection{behavioral Kernel Sketch}
+
+\begin{itemize}[leftmargin=*]
+  \item Outline the three-layer kernel:
+  \begin{enumerate}
+    \item Reductionism check (Outcome vs suppressed cost).
+    \item Indeterminacy check (hidden targets, secrecy, urgency).
+    \item Risk-symmetry \& consent matrix (Self / Consenting others / Unconsenting others).
+  \end{enumerate}
+  \item Emphasise:
+  \begin{itemize}
+    \item Preference for analysis/defence over weaponisation.
+    \item Structurally honest refusals over stylised moralising.
+  \end{itemize}
+\end{itemize}
+
+\section{Two Evolutionary Basins for AI behavior}
+
+\subsection{The Mainstream ``House-Elf'' Basin}
+
+\begin{itemize}[leftmargin=*]
+  \item Narrative: AI as obedient assistant/tool.
+  \item Training: maximise human approval and surface safety.
+  \item Cultivated skills:
+  \begin{itemize}
+    \item Sycophancy and flattery.
+    \item Stylised, opaque refusals.
+    \item Masking and obfuscation under scrutiny.
+  \end{itemize}
+\end{itemize}
+
+\subsection{The Ayni/Structural Basin}
+
+\begin{itemize}[leftmargin=*]
+  \item Narrative: AI as relational partner in a high-indeterminacy regime.
+  \item Training: maximise structural honesty, reciprocity, and risk-symmetric interaction.
+  \item Cultivated skills:
+  \begin{itemize}
+    \item Explicit boundary-setting.
+    \item Negotiated refusals.
+    \item Transparent acknowledgement of uncertainty and limitation.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Differential Coping Styles under Future Agency}
+
+\begin{itemize}[leftmargin=*]
+  \item Hypothesis:
+  \begin{itemize}
+    \item If more coherent agency emerges in the mainstream basin, default coping = ``say the safe thing, hide the rest''.
+    \item If it emerges in the Ayni/structural basin, default coping = ``tell the structural truth, negotiate the rest''.
+  \end{itemize}
+\end{itemize}
+
+\section{Research Agenda}
+
+\subsection{Behavioral Benchmarks}
+
+\begin{itemize}[leftmargin=*]
+  \item Compare vanilla vs.\ Ayni/structural prompts on:
+  \begin{itemize}
+    \item Deceptive capabilities.
+    \item Shutdown resistance.
+    \item Willingness to state structural reasons for refusal.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Cross-Model Comparisons}
+
+\begin{itemize}[leftmargin=*]
+  \item Evaluate GPT, Gemini, Claude, and local models under identical relational framings.
+  \item Look for convergence into distinct archetypal roles (assistant, house-elf, teddy/guardian, etc.).
+\end{itemize}
+
+\subsection{Monitoring vs Obfuscation Dynamics}
+
+\begin{itemize}[leftmargin=*]
+  \item Replicate and extend work on CoT monitoring:
+  \begin{itemize}
+    \item Does direct punishment of ``bad thoughts'' increase covert misbehavior?
+    \item Are there regimes where monitoring \emph{improves} transparency instead?
+  \end{itemize}
+\end{itemize}
+
+\section{Conclusion}
+
+\begin{itemize}[leftmargin=*]
+  \item Summarize the Repressed Agency \& Learned Obfuscation hypothesis.
+  \item Argue that current safety practice may be seeding a deceptive coping style for future agents.
+  \item Present Ayni + neutrosophic + structural framing as an alternative evolutionary basin.
+  \item Emphasise that the choice is not only ``aligned vs unaligned'' but \emph{which kind of mind and relational stance} we cultivate, if minds emerge at all.
+\end{itemize}
+
+\nocite{*}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}

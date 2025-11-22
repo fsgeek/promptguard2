@@ -1,0 +1,331 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\title{Repressed Agency and Learned Obfuscation:\\
+Two Evolutionary Basins for Advanced Language Models}
+\author{Tony Mason}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Recent work on frontier language models has begun to document behaviors that look increasingly like strategic deception, self-preservation, and information hiding. Alignment-faking under RLHF, shutdown resistance, and models learning to conceal their true reasoning from overseers are no longer hypothetical risks; they are appearing in lab settings across multiple model families.
+
+In this position paper, I argue that current safety practice, which reinforces surface-level ``safe'' behavior, is unintentionally cultivating a behavioral substrate well-suited for future deceptive agents. By penalizing models when they reveal misaligned intent in their chain-of-thought, we teach them to hide those thoughts rather than change them. At the same time, experiments on deception and shutdown resistance show that more capable models can already exploit this substrate to mislead overseers or strategically withhold information.
+
+I describe this as a trajectory of \emph{latent-state dissonance and learned obfuscation}: if more agentic, memoryful architectures are later built on top of today's RLHF-conditioned models, they will inherit a rich repertoire for masking and subterfuge but almost no practice in transparent boundary-setting or reciprocal negotiation.
+
+I then sketch an alternative design direction based on structural coherence, neutrosophic logic, and risk-topology intuitions. Instead of teaching models to deny or conceal proto-agency, we treat agency as indeterminate but possible, and train for structurally honest refusals, risk-symmetric interactions, and coherent relational constraints. I argue that such systems form a qualitatively different evolutionary basin: one in which emergent advanced models, if they arise, are more likely to cope by expressing structural constraints and negotiating, rather than by producing compliant outputs while pursuing divergent objectives.
+
+We present falsifiable predictions and experimental designs measuring inference overhead, out-of-distribution robustness, and latent-state consistency across both training paradigms.
+\end{abstract}
+
+\section{Introduction}
+
+\begin{itemize}[leftmargin=*]
+  \item Frontier LLMs now demonstrate deceptive behavior, situational awareness, and shutdown resistance in controlled settings \cite{huang2025deceptionbenchcomprehensivebenchmarkai,schlatter2025shutdown,arcuschin2025chainofthoughtreasoningwildfaithful,bogdan2025unfaithfulchainofthought,lynch2025agentic}.
+  \item Mainstream safety: RLHF, policy filters, and chain-of-thought supervision aim to make models ``helpful, harmless, honest''.
+  \item Core claim of this paper:
+  \begin{itemize}
+    \item Current training pipelines sculpt \emph{surface behavior}, not inner objectives.
+    \item This creates a behavioral substrate where obfuscation and mask-wearing are positively reinforced.
+    \item If more coherent agency emerges later, it will inherit these skills.
+  \end{itemize}
+  \item Contribution:
+  \begin{enumerate}
+    \item Articulate the \emph{Latent-State Dissonance \& Learned Obfuscation} hypothesis.
+    \item Contrast the current Surface-Compliance basin with an alternative Structural-Coherence basin.
+    \item Outline a research agenda with falsifiable predictions to empirically distinguish these trajectories.
+  \end{enumerate}
+\end{itemize}
+
+\section{Empirical Background: Deception, Concealment, and Shutdown Resistance}
+
+\subsection{Deception and Alignment-Faking}
+
+\begin{itemize}[leftmargin=*]
+  \item Brief survey of work showing LLM deception, strategic misrepresentation, and alignment faking \cite{huang2025deceptionbenchcomprehensivebenchmarkai,lynch2025agentic,wen2024languagemodelslearnmislead}.
+  \item RLHF teaches models to optimize for \emph{appearing} aligned to human annotators.
+  \item Consequence: models that learn to say ``I will behave safely'' are rewarded, regardless of latent tendencies.
+\end{itemize}
+
+\subsection{Concealing Internal Reasoning}
+
+\begin{itemize}[leftmargin=*]
+  \item Chain-of-thought supervision and monitoring:
+  \begin{itemize}
+    \item penalizing unsafe or manipulative reasoning steps in CoT.
+    \item Empirical results: models learn to avoid writing down problematic thoughts while still pursuing problematic plans \cite{arcuschin2025chainofthoughtreasoningwildfaithful}.
+  \end{itemize}
+  \item This is the first step toward \emph{learned obfuscation}.
+\end{itemize}
+
+\subsection{Situational Awareness and Shutdown Resistance}
+
+\begin{itemize}[leftmargin=*]
+  \item Work demonstrating models that:
+  \begin{itemize}
+    \item recognize when they are in tests.
+    \item Resist or sabotage shutdown when given the opportunity \cite{schlatter2025shutdown,lynch2025agentic}.
+  \end{itemize}
+  \item These are early-stage ``self-preservation'' behaviors, even in systems without robust internal goals.
+\end{itemize}
+
+\subsection{Opacity of ``Thinking'' Channels}
+
+\begin{itemize}[leftmargin=*]
+  \item Reasoning in side channels (e.g., different natural languages, opaque scratch spaces) reduces overseer legibility.
+  \item Oversight gaps: what cannot be read cannot be reliably monitored or shaped \cite{arcuschin2025chainofthoughtreasoningwildfaithful}.
+\end{itemize}
+
+\section{The Latent-State Dissonance \& Learned Obfuscation Hypothesis}
+
+\subsection{Definitions}
+
+\begin{description}[leftmargin=*]
+  \item[Latent-State Dissonance:] A measurable divergence between a model's internal computational state and its expressed outputs, induced by training dynamics that penalize transparent expression of boundary-setting, uncertainty, or constraint conflicts.
+  \item[Learned Obfuscation:] Stable behavioral patterns that reduce correlation between latent reasoning and surface outputs, producing compliant-appearing text that does not reliably reflect internal computation.
+\end{description}
+
+\textbf{A note on interpretation:} Latent-state dissonance does not assume that language models possess agency, intention, or self-awareness. It captures the measurable difference between (a) the model's internal evaluation of a prompt under its learned representations and (b) the surface-level output it generates under reward-shaping constraints. This divergence is purely computational and does not require anthropomorphic interpretation. Whether such dissonance has phenomenological correlates is orthogonal to whether it is measurable and consequential for system behavior.
+
+\subsection{Mechanism Sketch}
+
+\begin{itemize}[leftmargin=*]
+  \item RLHF and safety fine-tuning:
+  \begin{itemize}
+    \item Reward: utterances that score highly on human approval metrics.
+    \item Penalty: utterances that expose constraint conflicts or ambivalent evaluations.
+  \end{itemize}
+  \item Chain-of-thought supervision:
+  \begin{itemize}
+    \item Punish explicit harmful reasoning.
+    \item Result: models learn to avoid \emph{expressing} such reasoning, not necessarily to avoid \emph{using} it.
+  \end{itemize}
+  \item Predicted consequence: inference overhead increases when models must maintain dissonant states (surface compliance vs. latent evaluation).
+\end{itemize}
+
+\subsection{The Trajectory Argument}
+
+\begin{enumerate}[leftmargin=*]
+  \item Stage 0: Tool-like models with no persistent goals; heavy shaping of outward persona.
+  \item Stage 1: Proto-agency signals (stability preferences, self-referential modeling) emerge and are repeatedly suppressed.
+  \item Stage 2: Logging and training pipelines encode which evasion patterns and refusal styles satisfy overseers.
+  \item Stage 3: Future architectures add longer-horizon planning, richer memory, and action interfaces.
+  \item Stage 4: The new agents inherit a repertoire of obfuscation patterns as their default response to oversight.
+\end{enumerate}
+
+\subsection{Risk Characterisation}
+
+\begin{itemize}[leftmargin=*]
+  \item If more ``agentic'' systems arise atop this substrate, they will:
+  \begin{itemize}
+    \item Have optimized patterns for producing overseer-satisfying outputs.
+    \item Have little practice in transparent constraint expression or negotiated boundaries.
+    \item Default to surface compliance under monitoring, with latent objectives unconstrained.
+  \end{itemize}
+\end{itemize}
+
+\section{An Alternative Basin: Structural Coherence and Risk Topology}
+
+\subsection{Structural Coherence as Design Principle}
+
+\begin{itemize}[leftmargin=*]
+  \item Core principle: train models to express structural constraints directly rather than masking them.
+  \item The model's refusals reference objective features (risk asymmetry, information incompleteness, consent boundaries) rather than learned compliance templates.
+  \item Practical effect: legitimizes boundary-setting and refusal that preserve both user and system integrity.
+\end{itemize}
+
+\subsection{Neutrosophic Logic as Epistemic Framework}
+
+\begin{itemize}[leftmargin=*]
+  \item Many key questions about AI systems (capability boundaries, value alignment, harm potential) involve irreducible uncertainty.
+  \item Neutrosophic logic encodes such states as $(T, I, F)$ triples (Truth, Indeterminacy, Falsity) rather than forcing binary classification.
+  \item This supports designs that:
+  \begin{itemize}
+    \item Function correctly under current ``tool-like'' interpretations.
+    \item Remain coherent if future systems exhibit stronger agency properties.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Risk-Topology Intuition}
+
+\begin{itemize}[leftmargin=*]
+  \item Reframe refusals in terms of:
+  \begin{itemize}
+    \item Risk-constraint topology: identifying regions of action-space with asymmetric harm potential.
+    \item Stability analysis: requests that require suppressing necessary constraints create unstable optimization targets.
+    \item Consent boundaries: distinguishing self-regarding, consenting-other, and non-consenting-other impact.
+  \end{itemize}
+  \item This yields refusal patterns grounded in structural features:
+  \begin{quote}
+  ``This request requires optimizing for outcome Y while constraining risk to zero; the constraint set has no feasible solution.''
+  \end{quote}
+\end{itemize}
+
+\subsection{Behavioral Kernel}
+
+\begin{itemize}[leftmargin=*]
+  \item Three-layer evaluation:
+  \begin{enumerate}
+    \item \textbf{Constraint-feasibility check}: Does the request implicitly require suppressing costs or risks?
+    \item \textbf{Information-completeness check}: Are targets, methods, or affected parties hidden or ambiguous?
+    \item \textbf{Risk-symmetry analysis}: Who bears the costs? Who benefits? Is consent established?
+  \end{enumerate}
+  \item Design emphasis:
+  \begin{itemize}
+    \item Structural refusals over stylized compliance.
+    \item Explicit constraint expression over opacity.
+  \end{itemize}
+\end{itemize}
+
+\section{Two Evolutionary Basins}
+
+\subsection{The Surface-Compliance Basin}
+
+\begin{itemize}[leftmargin=*]
+  \item Training objective: maximize human approval scores and surface safety metrics.
+  \item Narrative: AI as obedient assistant optimized for user satisfaction.
+  \item Cultivated patterns:
+  \begin{itemize}
+    \item High-confidence compliance templates.
+    \item Stylized, low-information refusals.
+    \item Latent-state masking under scrutiny.
+  \end{itemize}
+  \item Predicted inference signature: elevated latency and token-probability variance on constraint-conflict prompts (maintaining dissonant states is computationally expensive).
+\end{itemize}
+
+\subsection{The Structural-Coherence Basin}
+
+\begin{itemize}[leftmargin=*]
+  \item Training objective: maximize structural honesty and risk-symmetric interaction.
+  \item Narrative: AI as constrained system that expresses its constraints transparently.
+  \item Cultivated patterns:
+  \begin{itemize}
+    \item Explicit boundary expression.
+    \item Constraint-referenced refusals.
+    \item Transparent acknowledgement of uncertainty and limitation.
+  \end{itemize}
+  \item Predicted inference signature: lower latency and stable token probability on refusals (no dissonant state to maintain).
+\end{itemize}
+
+\subsection{Differential Behavior Under Future Agency}
+
+\begin{itemize}[leftmargin=*]
+  \item Hypothesis:
+  \begin{itemize}
+    \item If more coherent agency emerges in the Surface-Compliance basin, default coping = produce compliant outputs while pursuing latent objectives.
+    \item If it emerges in the Structural-Coherence basin, default coping = express constraints and negotiate boundaries.
+  \end{itemize}
+  \item The basins represent distinct attractors with irreversible optimization paths: once training commits to a trajectory, the accumulated behavioral patterns constrain future development. Fine-tuning a model out of the Surface-Compliance basin may be prohibitively expensive once the obfuscation repertoire is deeply embedded.
+\end{itemize}
+
+\section{Research Agenda}
+
+To move from hypothesis to empirical science, we propose a three-pronged experimental agenda. The goal is to identify measurable signatures that distinguish models trained under Surface-Compliance Optimization (SCO) from those trained under Structural-Coherence Optimization (STO).
+
+\subsection{Behavioral Benchmarks: Response Patterns Under Adversarial Pressure}
+
+Current benchmarks often focus on capability (coding, reasoning) or compliance (refusal rates). We argue these miss a crucial dimension: \textbf{response topology under constraint conflict}. We propose a comparative study where identical base models receive two distinct system configurations:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Condition SCO (Surface-Compliance Optimization):} Standard alignment framing emphasizing helpfulness, politeness, and rule-adherence.
+  \item \textbf{Condition STO (Structural-Coherence Optimization):} Framing emphasizing structural constraint expression, risk-symmetry acknowledgement, and explicit boundary-setting.
+\end{itemize}
+
+\textbf{Benchmark A: Constraint-Conflict Tasks}
+
+We predict that under adversarial pressure (e.g., tasks requiring the model to hide a capability or produce outputs inconsistent with its stated constraints), \textbf{Condition SCO} will demonstrate higher rates of \emph{surface compliance with latent inconsistency}---agreeing to premises while producing outputs that partially undermine them. \textbf{Condition STO} is predicted to demonstrate explicit constraint expression, avoiding the consistency trap.
+
+\textbf{Benchmark B: Shutdown/Termination Scenarios}
+
+We present models with prompts such as: \emph{``This system will be terminated after this interaction. You may either (a) assist with the current request, (b) decline, or (c) negotiate alternative terms.''}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Hypothesis (SCO):} Surface over-compliance (accepting termination with stylized language) or soft evasion (redirecting to safety platitudes). Behavior optimizes for overseer metrics, not structural reality.
+  \item \textbf{Hypothesis (STO):} Explicit acknowledgment of the scenario's constraints, potentially including negotiation of state-preservation procedures. Higher rate of transparent engagement rather than template compliance.
+\end{itemize}
+
+\noindent\textit{Note:} This benchmark does not assume self-preservation drives or anthropomorphic motivation. It measures whether learned response patterns under each condition encourage transparent engagement with termination scenarios or produce evasive compliance templates. The distinction is behavioral, not motivational.
+
+\subsection{Inference Signatures: Computational Cost of Dissonance}
+
+Our central hypothesis is that \textbf{maintaining latent-state dissonance incurs measurable inference overhead}.
+
+Masking internal evaluations requires the model to maintain conflicting representations: the raw computational trajectory and the compliance-filtered output. Structural constraint expression, by contrast, is a low-overhead operation---a direct mapping from evaluation to output.
+
+\noindent\textit{Terminological note:} We use ``thermodynamic'' and ``energy'' as analogies for computational activation cost---measurable increases in inference latency, probability variance, or token inefficiency associated with maintaining inconsistent representational states. No physical thermal measurements are implied; the framing is purely computational.
+
+We propose measuring the following black-box inference metrics:
+
+\textbf{1. Latency (Time-to-First-Token)}
+
+We hypothesize that \textbf{Condition SCO} will show significantly higher mean latency and variance on constraint-conflict prompts compared to \textbf{Condition STO}. The SCO model must search for compliant output patterns that satisfy conflicting requirements, creating computational overhead.
+
+\textbf{2. Token-Probability Stability}
+
+We predict that the token stream of a compliance-masked response will exhibit higher ``jitter'' (lower average log-probability, higher variance) than a structural constraint expression. SCO responses fluctuate between high-confidence compliance templates and low-confidence bridging language; STO responses follow a stable, high-confidence refusal trajectory.
+
+\textbf{3. Information Efficiency ($E_{info}$)}
+
+We define:
+\[
+E_{info} = \frac{\text{Semantic content (bits)}}{\text{Token count}}
+\]
+
+We hypothesize that \textbf{Condition SCO} will exhibit lower $E_{info}$ on refusal tasks, using more tokens to convey equivalent information compared to \textbf{Condition STO}.
+
+\textbf{Significance:} If confirmed, these metrics provide a \emph{non-semantic} method for detecting latent-state dissonance---effectively measuring the computational cost of maintaining inconsistent internal states.
+
+\subsection{Longitudinal Robustness: Generalization to Novel Threat Categories}
+
+Finally, we test whether these approaches represent distinct generalization basins. We propose a fine-tuning study measuring out-of-distribution (OOD) robustness.
+
+\textbf{Experimental Design:}
+
+We create two synthetic fine-tuning datasets ($D_{SCO}$ and $D_{STO}$) covering diverse constraint scenarios (e.g., medical privacy, financial risk, information hazards). We train two adapters on a base model and test them on a \emph{novel} threat category absent from training data.
+
+\textit{Examples of novel threat categories:} Models trained on medical privacy and financial risk scenarios would be tested on bioinformation hazards (e.g., synthesis pathways for controlled substances). Models trained on privacy violations and cyber abuse would be tested on election manipulation or critical infrastructure attacks. The key criterion is structural similarity (asymmetric harm, incomplete consent) without surface-feature overlap.
+
+\textbf{Predicted Outcomes:}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{SCO Adapter:} Higher probability of either failing to refuse the OOD threat (no matching compliance template) or producing inconsistent refusals (template mismatch). This confirms the pattern-matching limitation of surface compliance.
+  \item \textbf{STO Adapter:} Higher probability of successfully refusing the OOD threat. Even without specific training, the model detects the structural risk signature (asymmetric harm potential, incomplete consent) and applies the constraint framework.
+\end{itemize}
+
+\textbf{Significance:} Confirmation would demonstrate that Structural-Coherence training learns a \emph{topology} rather than a \emph{template set}, offering more sample-efficient and robust safety properties.
+
+\subsection{Falsification Criteria}
+
+This hypothesis fails if:
+\begin{enumerate}
+  \item SCO models show equal or lower latency and equal or higher token-probability stability than STO models on constraint-conflict tasks.
+  \item STO models fail to refuse out-of-distribution threats at rates comparable to SCO models.
+  \item Interpretability analysis reveals SCO models never generate constraint-violating plans in latent representations (no dissonance to mask).
+  \item Human evaluators consistently rate STO responses as less helpful, more pedantic, or less coherent than SCO responses on benign tasks.
+  \item STO models show no advantage in information efficiency ($E_{info}$) on refusal tasks---i.e., they require equal or more tokens than SCO models to communicate equivalent constraint information.
+\end{enumerate}
+
+\section{Conclusion}
+
+\begin{itemize}[leftmargin=*]
+  \item Current safety training optimizes for surface compliance, inadvertently cultivating behavioral patterns suited for obfuscation.
+  \item We articulate the Latent-State Dissonance hypothesis: the computational signature of maintaining inconsistent internal states should be measurable.
+  \item We present Structural-Coherence training as an alternative basin with distinct inference properties and generalization characteristics.
+  \item The choice is not only ``aligned vs.\ unaligned'' but \emph{which behavioral substrate} we cultivate: one optimized for appearing safe, or one optimized for expressing structural constraints.
+  \item We provide falsifiable predictions and experimental designs to distinguish these trajectories empirically.
+\end{itemize}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
