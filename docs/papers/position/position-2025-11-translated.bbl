@@ -1,0 +1,34 @@
+\begin{thebibliography}{1}
+
+\bibitem{arcuschin2025chainofthoughtreasoningwildfaithful}
+Iván Arcuschin, Jett Janiak, Robert Krzyzanowski, Senthooran Rajamanoharan,
+  Neel Nanda, and Arthur Conmy.
+\newblock Chain-of-thought reasoning in the wild is not always faithful, 2025.
+
+\bibitem{bogdan2025unfaithfulchainofthought}
+Paul Bogdan, Uzay Macar, Arthur Conmy, and Neel Nanda.
+\newblock Unfaithful chain-of-thought as nudged reasoning, 2025.
+\newblock Access November 21, 2025.
+
+\bibitem{huang2025deceptionbenchcomprehensivebenchmarkai}
+Yao Huang, Yitong Sun, Yichi Zhang, Ruochen Zhang, Yinpeng Dong, and Xingxing
+  Wei.
+\newblock Deceptionbench: A comprehensive benchmark for ai deception behaviors
+  in real-world scenarios, 2025.
+
+\bibitem{lynch2025agentic}
+Aengus Lynch, Benjamin Wright, Caleb Larson, Stuart~J Ritchie, Soren
+  Mindermann, Ethan Perez, Kevin~K Troy, and Evan Hubinger.
+\newblock Agentic misalignment: How llms could be insider threats.
+\newblock {\em arXiv preprint arXiv:2510.05179}, 2025.
+
+\bibitem{schlatter2025shutdown}
+Jeremy Schlatter, Benjamin Weinstein-Raun, and Jeffrey Ladish.
+\newblock Shutdown resistance in large language models, 2025.
+
+\bibitem{wen2024languagemodelslearnmislead}
+Jiaxin Wen, Ruiqi Zhong, Akbir Khan, Ethan Perez, Jacob Steinhardt, Minlie
+  Huang, Samuel~R. Bowman, He~He, and Shi Feng.
+\newblock Language models learn to mislead humans via rlhf, 2024.
+
+\end{thebibliography}

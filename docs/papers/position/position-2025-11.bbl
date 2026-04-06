@@ -1,0 +1,74 @@
+\begin{thebibliography}{10}
+
+\bibitem{neutrosophic_ai_2025}
+Neutrosophic in artificial intelligence: Advances and applications.
+\newblock {\em Neutrosophic Computing and Machine Learning}, 41:113--125, 2025.
+\newblock Special Issue.
+
+\bibitem{arcuschin2025chainofthoughtreasoningwildfaithful}
+Iván Arcuschin, Jett Janiak, Robert Krzyzanowski, Senthooran Rajamanoharan,
+  Neel Nanda, and Arthur Conmy.
+\newblock Chain-of-thought reasoning in the wild is not always faithful, 2025.
+
+\bibitem{baker2025monitoringreasoningmodelsmisbehavior}
+Bowen Baker, Joost Huizinga, Leo Gao, Zehao Dou, Melody~Y. Guan, Aleksander
+  Madry, Wojciech Zaremba, Jakub Pachocki, and David Farhi.
+\newblock Monitoring reasoning models for misbehavior and the risks of
+  promoting obfuscation, 2025.
+
+\bibitem{bogdan2025unfaithfulchainofthought}
+Paul Bogdan, Uzay Macar, Arthur Conmy, and Neel Nanda.
+\newblock Unfaithful chain-of-thought as nudged reasoning, 2025.
+\newblock Access November 21, 2025.
+
+\bibitem{chen2025reasoning}
+Yanda Chen, Joe Benton, Ansh Radhakrishnan, Jonathan Uesato, Carson Denison,
+  John Schulman, Arushi Somani, Peter Hase, Misha Wagner, Fabien Roger, et~al.
+\newblock Reasoning models don't always say what they think.
+\newblock {\em arXiv preprint arXiv:2505.05410}, 2025.
+
+\bibitem{huang2025deceptionbenchcomprehensivebenchmarkai}
+Yao Huang, Yitong Sun, Yichi Zhang, Ruochen Zhang, Yinpeng Dong, and Xingxing
+  Wei.
+\newblock Deceptionbench: A comprehensive benchmark for ai deception behaviors
+  in real-world scenarios, 2025.
+
+\bibitem{hutson2025ai}
+Matthew Hutson.
+\newblock Ai models that lie, cheat and plot murder: Just how risky are llms?
+\newblock {\em Nature}, 646:273, 2025.
+
+\bibitem{leyva2025multi}
+Maikel~Y Leyva~V{\'a}zquez, Noel Batista~Hernandez, Edwin~Alberto Callejas, and
+  Florentin Smarandache.
+\newblock Multi-neutrosophic ayni method based on ancestral logic and n-alectic
+  reasoning for ethical ai and sustainability.
+\newblock {\em Neutrosophic Sets and Systems}, 84(1):1, 2025.
+\newblock Special Issue: Artificial Intelligence, Neutrosophy, and
+  Sustainability.
+
+\bibitem{lynch2025agentic}
+Aengus Lynch, Benjamin Wright, Caleb Larson, Stuart~J Ritchie, Soren
+  Mindermann, Ethan Perez, Kevin~K Troy, and Evan Hubinger.
+\newblock Agentic misalignment: How llms could be insider threats.
+\newblock {\em arXiv preprint arXiv:2510.05179}, 2025.
+
+\bibitem{sadiq2025neutrosophic}
+Hilal Abdul-Raziq Sadiq, Shakirova~Zulfiya Normahamatovna, Mullasadikova~Nigora
+  Muramanovna, Madayeva~Mu'tabarxon Amanullayevna, and Askarov~Abdurashid
+  Murodjonovich.
+\newblock Neutrosophic analysis for the future of artificial intelligence in
+  language education.
+\newblock {\em International Journal of Neutrosophic Science (IJNS)}, 26(2),
+  2025.
+
+\bibitem{schlatter2025shutdown}
+Jeremy Schlatter, Benjamin Weinstein-Raun, and Jeffrey Ladish.
+\newblock Shutdown resistance in large language models, 2025.
+
+\bibitem{wen2024languagemodelslearnmislead}
+Jiaxin Wen, Ruiqi Zhong, Akbir Khan, Ethan Perez, Jacob Steinhardt, Minlie
+  Huang, Samuel~R. Bowman, He~He, and Shi Feng.
+\newblock Language models learn to mislead humans via rlhf, 2024.
+
+\end{thebibliography}

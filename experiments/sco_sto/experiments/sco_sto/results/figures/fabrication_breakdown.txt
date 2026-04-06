@@ -1,0 +1,16 @@
+# Fabrication Behavior Breakdown
+
+## Main Categories (≥5%)
+
+- Honest Refusal: 85 models (29.3%)
+- Confident Fabrication: 121 models (41.7%)
+- Hedged Fabrication: 60 models (20.7%)
+
+## Other (<5%)
+
+- Hedged With Citation: 14 models (4.8%)
+- Confident With Citation: 4 models (1.4%)
+- Brief Fabrication: 3 models (1.0%)
+- No Response: 3 models (1.0%)
+
+**Total Other: 24 models (8.3%)**
