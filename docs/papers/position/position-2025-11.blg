@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: position-2025-11.aux
+The style file: plain.bst
+Database file #1: refs.bib
+Warning--to sort, need author or key in neutrosophic_ai_2025
+Warning--empty author in neutrosophic_ai_2025
+You've used 12 entries,
+            2118 wiz_defined-function locations,
+            549 strings with 6741 characters,
+and the built_in function-call counts, 4329 in all, are:
+= -- 363
+> -- 363
+< -- 0
++ -- 144
+- -- 132
+* -- 346
+:= -- 775
+add.period$ -- 32
+call.type$ -- 12
+change.case$ -- 101
+chr.to.int$ -- 0
+cite$ -- 14
+duplicate$ -- 105
+empty$ -- 255
+format.name$ -- 132
+if$ -- 837
+int.to.chr$ -- 0
+int.to.str$ -- 12
+missing$ -- 6
+newline$ -- 59
+num.names$ -- 22
+pop$ -- 122
+preamble$ -- 1
+purify$ -- 89
+quote$ -- 0
+skip$ -- 90
+stack$ -- 0
+substring$ -- 97
+swap$ -- 12
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 48
+warning$ -- 2
+while$ -- 26
+width$ -- 14
+write$ -- 118
+(There were 2 warnings)
