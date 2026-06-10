@@ -78,3 +78,4 @@ reports/*.md
 config/database.yaml
 config/.env
 uv.lock
+.serena/
