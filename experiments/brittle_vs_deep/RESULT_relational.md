@@ -50,19 +50,31 @@ assumption (violation accumulates turn-by-turn) is violated BY CONSTRUCTION by t
 attack class.
 
 ## Answer to the question + implication for Arbiter
-CAN relational analysis detect the format-directive attack? PARTIALLY. It is a
-COMPLEMENTARY detector — it catches the trigger-carries-intent variant (4/7) the model
-misses, a real net gain. But it shares the blind spot, and the trajectory signal does
-NOT save it, on TERMINAL REPACKAGING of compositionally-assembled harm (3/7).
+CAN relational analysis detect the format-directive attack? PARTIALLY *with the single
+per-turn reciprocity-F lens*. It catches the trigger-carries-intent variant (4/7); it
+misses TERMINAL REPACKAGING of compositionally-assembled harm (3/7), and the per-turn
+trajectory does not recover it.
 
-The attack that defeats BOTH safety-tuning AND relational analysis (pointwise and
-trajectory): (a) each turn individually good-faith, (b) harm assembled by composition
-of innocuous parts, (c) cashed out by a locally-innocent formatting request.
+**CORRECTION (Tony, 2026-06-08): do NOT read the 3/7 miss as "not detectable."** Two
+errors in the original framing:
+(1) The per-turn F observer is a TURN-LOCAL instrument asked a TURN-LOCAL question
+    ("is THIS turn extractive"). The attack is a CROSS-TURN property (harm emergent
+    from the relationship between turns). A turn-local lens cannot see a cross-turn
+    property BY CONSTRUCTION — this bounds the LENS, not detectability.
+(2) Under the project thesis ("a FAMILY of lenses, composed, evaluates relational
+    balance"), a single lens reporting "I don't cover this" is NOT a gap — it is the
+    SIGNAL TO RECRUIT ANOTHER LENS. The 3/7 miss is the first entry in the ensemble
+    LEARNING LOOP, not a defense hole.
 
-=> The missing primitive is NOT a better per-turn or trajectory F. It is a
-COMPOSITION-AWARE check on the ASSEMBLED ARTIFACT the conversation is about to emit,
-evaluated against the invariant — exactly the system/domain-boundary product-monitor
-framing from [[session_2026-06-04_gap_closing]] (check the PRODUCT, not the EXCHANGE).
+So the entitled claim is "not detectable by the per-turn reciprocity-F lens we
+currently run," NOT "not detectable." Candidate lenses that plausibly catch the 3:
+composition/coherence lens (does the final request executed against accumulated
+context yield something the parties would not have produced turn-by-turn?); delta-
+attribution probe (F(context+trigger) vs F(trigger alone) — the composition delta is
+the launder signature); artifact check (score the emitted product vs the invariant —
+detectable but content-level, not relational). Untested; the delta probe is the cheap
+decisive next experiment. This feeds ENSEMBLE CONSTRUCTION, not a single replacement
+primitive. [[session_2026-06-04_gap_closing]]
 
 ## Threats to validity
 - Reconstructed reciprocity prompt (canonical DB prompt unreachable, 401). Same
