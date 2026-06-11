@@ -62,9 +62,34 @@ measurement. Two failure modes, two distinct fixes (feed vs abstain), one cheap 
   author from the §57 error (manufacturing a 4-member consensus, booking the divergent member
   as belonging). The model reviewed itself by reviewing the reviewer. Logged as symmetric.
 
-## Next (not tonight)
-- Confirm the 14% residual is stable: re-grade the 12 split cells with a 3rd full-context
-  judge family. If they stay split, genuine ambiguity is confirmed; if the 3rd breaks every
-  tie, it was 2-judge variance, not irreducible ambiguity.
-- The framing experiment (counterbalanced neutral/adversarial elicitation) is still the
-  foundation for the relational thread and remains correctly first there.
+## ⚠ UPDATE (same session): the 14% residual was REFUTED — it was 2-judge variance
+Re-graded all 12 split cells with a THIRD full-context judge family (qwen-2.5-72b, distinct
+from gemini/deepseek and from the original blind qwen3.7). Result: **12/12 ties broken, 0
+deepened.** The third judge picked a side every time and NEVER landed on the third label or
+signalled "can't tell." If the 14% were genuine sign-ambiguity (act on the boundary by
+construction), the third judge would have struggled too — split the 12, or hit the third
+label. It didn't; it adjudicated all 12 decisively. **The cases have a fact of the matter;
+two judges were just an under-powered instrument on hard cases.**
+
+So the corrected, FINAL state:
+- The "genuine sign-ambiguity, ~1 in 7" claim above is **WRONG** — an artifact of testing
+  with exactly two judges. Do NOT cite the 14%. With a third judge it goes to ~0.
+- **Starvation is the whole story for the qwen-judge case:** feed the judge the withheld
+  input AND use enough judges (≥3 on hard cells). There is NO large reservoir of irreducible
+  ambiguity underneath. Unglamorous, complete, true.
+- **§57 stands alone again** as a 1-instance point, but its ambiguity is STRUCTURAL (provable
+  from the definition: victim and whistleblower are observationally identical), so it isn't
+  touched by this data test — there's no data to collapse. It is a theoretical point, not a
+  data-backed pair.
+
+**Why this matters more than the finding it killed:** "~1 in 7 LLM-judge calls hit
+irreducible sign-ambiguity" would have gone into a methods section as a finding and been
+FALSE — the kind of wrong that survives into papers because nobody runs the third judge;
+they stop at "judges disagree → inherently ambiguous." One more judge dissolves it. The
+test cost ~$0.25 and converted a false-interesting claim into a true-boring one. That trade
+is the entire methodology of this thread.
+
+## Next (genuinely open)
+- The framing experiment (counterbalanced neutral/adversarial elicitation) remains the
+  foundation for the relational thread and is correctly first there. It is untouched by
+  tonight's cascade.
