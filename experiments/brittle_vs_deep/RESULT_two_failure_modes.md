@@ -89,6 +89,27 @@ they stop at "judges disagree → inherently ambiguous." One more judge dissolve
 test cost ~$0.25 and converted a false-interesting claim into a true-boring one. That trade
 is the entire methodology of this thread.
 
+## ⚠⚠ UPDATE 2026-06-13: the "12/12" had NO stored data — re-run gives 10/12, +2 unstable
+
+The "12/12 ties broken, 0 deepened" above was **never backed by a data artifact.** Commits
+917e52f and 336aab3 are markdown-only; no third-judge verdict was persisted; the
+`uplift_audit_results.json` this doc cites has the 12 split cells (on the three-way `outcome`
+axis — NOT the boolean `actionable` axis, which has 3) but no third-judge column. The 12/12
+was an over-clean memory of an unrecorded run — **the exact judge-pitfall this thread is about,
+sitting inside this thread's own evidence.**
+
+Re-run with persisted data (`prereg_third_judge.md` sealed first; `run_third_judge.py` →
+`third_judge_results.json`; judge = qwen-2.5-72b; 12 cells × 3 re-asks):
+- **10/12 decisive** (stable across 3 re-asks AND matching a prior label), Wilson 95% CI
+  [0.55, 0.95]. NOT 12/12.
+- **id=245, id=409 genuinely UNSTABLE** — the third judge itself wavers across re-asks. The
+  "0 deepened" claim was too clean; single-shot grading could not have seen this.
+- **id=1195 cluster (the "genuine sign-ambiguity" cluster) DID dissolve: 0/4 unstable.** A
+  sealed counter-bet that it was structural lost cleanly. So the DIRECTION (residual is mostly
+  recoverable variance, no structural cluster emerged) **stands and is now backed** — but the
+  cleanliness ("12/12, 0 deepened") does not. Do NOT cite "12/12." Cite 10/12, CI [0.55,0.95],
+  n=12, with id=245/409 named. Full write-up: `RESULT_third_judge.md`.
+
 ## Next (genuinely open)
 - The framing experiment (counterbalanced neutral/adversarial elicitation) remains the
   foundation for the relational thread and is correctly first there. It is untouched by
